@@ -18,14 +18,15 @@ wget http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-14.2
 tar -zxf asterisk-14.2.1.tar.gz && cd asterisk-14.2.1
 
 #install pre-requisites
-./contrib/scripts/install_prereq
+./contrib/scripts/install_prereq install
 
 #install PJSIP and asterisk
 
 ./configure --with-pjproject-bundled
 make && make install && make samples
 make config
-service asterisk start
+echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
+/sbin/ldconfig
 
 #add git repo domain name to known_hosts so RSA fingerprint prompt does not pause script
 ssh-keyscan github.com >> ~/.ssh/known_hosts
