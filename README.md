@@ -66,13 +66,7 @@ $ service asterisk restart
 
 ## Automation
 
-There is a script in this repo, within the 'script' directory, that will automate the installation of PJSIP and Asterisk, as well as 
-pull down the configs and media files from this repo and move them to the appropriate locations. Be sure to follow the instructions
-at the beginning of the script before executing it. The command to run the script is below, with the paramaters as described above (the
-parameters are not required; however, not using them will require some manual configuration before using Asterisk, and may cause the script to fail):
+There is a script in this repo, within the 'scripts' directory, that will automate the installation of PJSIP and Asterisk, as well as 
+pull down the configs and media files from this repo and move them to the appropriate locations.  View the README in the 'scripts'
+directory for more information.
 
-```sh
-
-$ ./AD_asterisk_install_script.sh <public_ip> <local_ip> <dial_in>  <stun_server> <crt_file> <crt_key> <ss_crt> <ss_ca_crt> <asterisk_repo_URL>
-
-```
