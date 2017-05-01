@@ -131,8 +131,8 @@ fi
 echo $PUBLIC_IP
 echo $LOCAL_IP
 echo $STUN_SERVER
-echo "Reached stopping point"
-exit 0
+#echo "Reached stopping point"
+#exit 0
 
 # prompt user to update packages
 echo "It is recommended to update the packages in your system. Proceed? (y/n)"
@@ -173,9 +173,6 @@ sleep 2
 
 #generate TIS certificates
 ./contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE direct" -d /etc/asterisk/keys
-
-#add git repo domain name to known_hosts so RSA fingerprint prompt does not pause script
-ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 # pull down confi/media files and add to /etc/asterisk and /var/lib/asterisk/sounds, respectively
 cd ~
