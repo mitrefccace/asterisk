@@ -17,6 +17,7 @@ The Asterisk for ACE Direct configuration assumes the following:
 
 * SELinux and IPv6 are disabled. If the script detects either of these two items, it will exit.
 * The Asterisk server has a public and local IPv4 address. These are mandatory and the script will also fail without these two parameters.
+* A hostname has been set on the server. If not hostname has been set, the script will fail.
 * A "dial-in" number which has been registered in iTRS and/or a SIP trunk provider (such as Twilio) (optional)
 * An SSL cert file, acquired from a trusted certificate authority, for the domain of your server. This is necessary for WebRTC functionality as major browsers will drop connections to the Asterisk server if it's cert is not trusted.
 

@@ -23,6 +23,9 @@ GOOGLE='stun4.l.google.com:19302'
 #Asterisk version
 AST_VERSION=14.4.0
 
+#Hostname command suggestion
+HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
+
 print_args()
 {
 
@@ -131,17 +134,30 @@ then
     exit 1
 fi
 
-echo $PUBLIC_IP
-echo $LOCAL_IP
-echo $STUN_SERVER
-#echo "Reached stopping point"
-#exit 0
+#check hostname and fail if not set
+HOSTNAME=$(hostname -f)
+if [ -z $HOSTNAME ]
+then
+	echo "ERROR: no hostname set on this server. Set the hostname, then re run the script."
+	echo $HOST_SUGG
+	exit 1
+fi
+
+#ask user to validate hostname
+echo "The hostname of this server is currently $HOSTNAME. Is this the hostname you want to use with Asterisk? (y/n)"
+read response
+if [ $response == "n" ]
+	then
+	echo "Exiting. Set the hostname, then rerun the script."
+	echo $HOST_SUGG
+	exit 0
+fi
 
 # prompt user to update packages
 echo "It is recommended to update the packages in your system. Proceed? (y/n)"
-read response
+read response2
 
-if [ $response == "y" ]
+if [ $response2 == "y" ]
 then
     echo "Executing yum update"
     yum -y update
