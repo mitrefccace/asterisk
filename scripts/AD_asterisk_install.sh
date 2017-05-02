@@ -20,6 +20,9 @@ CRT_KEY=''
 #default STUN will be set to Google
 GOOGLE='stun4.l.google.com:19302'
 
+#Asterisk version
+AST_VERSION=14.4.0
+
 print_args()
 {
 
@@ -150,8 +153,8 @@ yum -y install -y epel-release bzip2 dmidecode gcc-c++ ncurses-devel libxml2-dev
 
 #download Asterisk
 cd /usr/src
-wget http://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-14.4.0.tar.gz
-tar -zxf asterisk-14.4.0.tar.gz && cd asterisk-14.4.0
+wget http://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-$AST_VERSION.tar.gz
+tar -zxf asterisk-$AST_VERSION.tar.gz && cd asterisk-$AST_VERSION
 
 #install pre-requisites
 ./contrib/scripts/install_prereq install
