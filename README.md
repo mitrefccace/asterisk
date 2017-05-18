@@ -64,6 +64,18 @@ $ service asterisk restart
 
 ```
 
+## Modules
+Some Asterisk modules have been enabled/disabled in the modules.conf file. Notable modules include:
+
+* res_http_websocket.so: preloaded so that WebSocket connections for WebRTC will work
+* res_musiconhold.so: loaded for music-on-hold capability for queues
+* res_pjsip.so: loaded so PJSIP stack can be used
+* chan_skinny.so: Skinny protocol for Cisco phones. Disabled because this causes Asterisk to listen to TCP connections on port 2000
+* cel_pgsq.so: It appears that Asterisk v.14.4.0 trues to connect to PostgreSQL by default, and would cause error messages to be logged to the Asterisk console. Since ACE DIrect uses MySQL, this module has been disbaled.
+* chan_sip.so: disabled so PJSIP stack can be used
+
+If you want/need any of these modules, feel free to modify the modules.conf file.
+
 ## Automation
 
 There is a script in this repo, within the 'scripts' directory, that will automate the installation of PJSIP and Asterisk, as well as 
