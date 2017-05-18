@@ -28,7 +28,7 @@ The Asterisk for ACE Direct configuration assumes the following:
 * <public_ip>: The external.public IP address of the Asterisk server
 * <local_ip>: The private/local IP address of the Asterisk
 * <stun_server>: STUN/TURN server address:port. We recommend building a dedicated STUN server, as public STUN servers can become congested and lead to higher latency for STUN/ICE. If you do not have one, a Google STUN server will be used in the config instead.
-* <dial_in>: Dial-in number. If one is not provided, the string '12345' will be used instead to prevent the config files form failing to be parsed by Asterisk. You can replace this string in the future in extensions.conf if a dial-in number is acquired after installation.
+* <dial_in>: Dial-in number. If one is not provided, the string '12345' will be used instead to prevent the config files from failing to be parsed by Asterisk. You can replace this string in the future in extensions.conf if a dial-in number is acquired after installation.
 * <crt_file>: CA cert file for server. Generated self-signed cert is used if none is provided.
 * <crt_key>: Private key for CA cert
 
