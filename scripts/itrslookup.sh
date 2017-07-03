@@ -11,6 +11,9 @@
 #       $1: Number to lookup. Input should be in a form like: 7272022137
 #       $2: modes as described above ["simple"|"full"]
 #
+# Example dial-plan execution:
+#	same => AGI(itrslookup.sh,${EXTEN},"simple")
+#
 # Authors: Joe Gruessing and Said Masoud
 #
 
