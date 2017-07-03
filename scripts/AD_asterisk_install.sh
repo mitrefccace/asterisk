@@ -200,6 +200,10 @@ cd asterisk
 yes | cp -rf asterisk-configs/* /etc/asterisk
 yes | cp -rf asterisk-videos-audios/sounds/* /var/lib/asterisk/sounds/
 
+#copy iTRS lookup script to agi-bin and make it executable
+yes | cp -rf scripts/itrslookup.sh /var/lib/asterisk/agi-bin
+chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
+
 #modify configs with named params
 
 cd /etc/asterisk
