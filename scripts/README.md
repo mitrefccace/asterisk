@@ -33,6 +33,21 @@ The Asterisk for ACE Direct configuration assumes the following:
 * <crt_file>: CA cert file for server. Generated self-signed cert is used if none is provided.
 * <crt_key>: Private key for CA cert
 
+##Twilio
+
+You can configure Twilio for use with Asterisk to route PSTN (i.e. non-VRS) calls to/from Asterisk. the extensions.conf and pjsip.conf files have configurations set for use with Twilio; however, they will not work unless you replace the <twilio_URI> placeholder in pjsip.conf with the Twilio termination URI of your SIP trunk. If it is not desired to use Twilio with ACE Direct, simply delete the sections of the dial-plan and SIP config that pertain to Asterisk. For more information on using Twilio with Asterisk, [download the Twilio docs](https://www.twilio.com/docs/documents/35/AsteriskTwilioSIPTrunkingv2_1.pdf).
+
+##Identity Management
+
+The pjsip.conf file defines user profiles that can be used to register to Asterisk. Each user profile has a password associated with it.
+Before starting and using Asterisk, IT IS HIGHLY RECOMMENDED to change the passwords fo each user account that will be used, as well as removing the ones that won't be used. Each password attribute currently has the placeholder <password> set in it. This is not recommended,
+however if you'd like each profile to have the same password you can execute the following:
+
+```sh
+
+$ sed -i -e 's/<password>/<the password you choose>/g' pjsip.conf
+
+```
 
 ## Example usage
 
