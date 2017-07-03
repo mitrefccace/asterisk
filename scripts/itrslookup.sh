@@ -12,7 +12,7 @@
 #       $2: modes as described above ["simple"|"full"]
 #
 # Example dial-plan execution:
-#	same => AGI(itrslookup.sh,${EXTEN},"simple")
+#	same => n,AGI(itrslookup.sh,${EXTEN},"simple")
 #
 # Authors: Joe Gruessing and Said Masoud
 #
