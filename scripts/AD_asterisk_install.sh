@@ -218,4 +218,16 @@ sed -i -e "s/<ss_cert>/\/etc\/asterisk\/keys\/asterisk.pem/g" pjsip.conf
 sed -i -e "s/<ss_ca_crt>/\/etc\/asterisk\/keys\/ca.crt/g" pjsip.conf
 
 echo ""
+echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"
+echo "manager password in manager.conf should be updated before starting Asterisk."
+echo "Otherwise, the defaults will be used. View the conf files in /etc/asterisk"
+echo "for more info."
+echo ""
+echo ""
+echo "     _    ____ _____   ____ ___ ____  _____ ____ _____ "
+echo "    / \  / ___| ____| |  _ \_ _|  _ \| ____/ ___|_   _|"
+echo "   / _ \| |   |  _|   | | | | || |_) |  _|| |     | |  "
+echo "  / ___ \ |___| |___  | |_| | ||  _ <| |__| |___  | |  "
+echo " /_/   \_\____|_____| |____/___|_| \_\_____\____| |_|  "
+echo ""
 echo "Installation is complete. When ready, run 'service asterisk start' as root to start Asterisk."
