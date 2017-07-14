@@ -197,8 +197,8 @@ sleep 2
 cd ~
 git clone https://github.com/mitrefccace/asterisk.git
 cd asterisk
-yes | cp -rf asterisk-configs/* /etc/asterisk
-yes | cp -rf asterisk-videos-audios/sounds/* /var/lib/asterisk/sounds/
+yes | cp -rf config/* /etc/asterisk
+yes | cp -rf media/* /var/lib/asterisk/sounds/
 
 #copy iTRS lookup script to agi-bin and make it executable
 yes | cp -rf scripts/itrslookup.sh /var/lib/asterisk/agi-bin
