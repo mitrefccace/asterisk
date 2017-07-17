@@ -165,15 +165,27 @@ fi
 
 # installing pre-requisite packages
 echo "Installing pre-requisite packages for Asterisk and PJPROJECT"
-yum -y install -y epel-release bzip2 dmidecode gcc-c++ ncurses-devel libxml2-devel make wget openssl-devel newt-devel kernel-devel sqlite-devel libuuid-devel gtk2-devel jansson-devel binutils-devel git patch uuid uuid-devel
+yum -y install -y epel-release bzip2 dmidecode gcc-c++ ncurses-devel libxml2-devel make wget netstat telnet vim zip unzip openssl-devel newt-devel kernel-devel libuuid-devel gtk2-devel jansson-devel binutils-devel git libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel mysql-connector-odbc tcpdump
 
 #download Asterisk
 cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-$AST_VERSION.tar.gz
 tar -zxf asterisk-$AST_VERSION.tar.gz && cd asterisk-$AST_VERSION
 
-#install pre-requisites
+#remove RPM version of pjproject from pre-requisites install script
+sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 ./contrib/scripts/install_prereq install
+
+
+#the following code modifications reverse the commits made below,
+#and are needed to enable proper video RTP with provider devices.
+#Commit: https://gerrit.asterisk.org/#/c/3899/
+#Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-26554
+
+#remove hard-coded sample rate
+sed -i -e 's/.sample_rate = 1000,//g' main/codec_builtin.c
+#remove timestamp from frame
+sed -i -e '4975,4976d' res/res_rtp_asterisk.c
 
 #install PJSIP and asterisk
 
