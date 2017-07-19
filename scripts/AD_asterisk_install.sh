@@ -192,7 +192,6 @@ sed -i -e '4975,4976d' res/res_rtp_asterisk.c
 ./configure --with-pjproject-bundled
 make
 make install
-make samples
 make config
 
 #run ldconfig so that Asterisk finds PJPROJECT packages
