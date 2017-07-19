@@ -118,11 +118,11 @@ fi
 
 #check for IPv6 and SElinux
 
-ENABLED="enforcing"
-SESTATUS=$(sestatus | sestatus | grep "Current mode" | awk '{print $3}')
+DISABLED="disabled"
+SESTATUS=$(sestatus | grep "Current mode" | awk '{print $3}')
 IPV6=$(cat /proc/net/if_inet6)
 
-if [ $SESTATUS == $ENABLED ]
+if [ $SESTATUS != $DISABLED ]
 then
     echo "ERROR: SELinux must be disabled before running Asterisk. Disable SELinux, reboot the server, and try again."
     exit 1
