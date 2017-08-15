@@ -21,7 +21,7 @@ CRT_KEY=''
 GOOGLE='stun4.l.google.com:19302'
 
 #Asterisk version
-AST_VERSION=14.4.0
+AST_VERSION=14.6.0-rc1
 
 #Hostname command suggestion
 HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
@@ -170,7 +170,7 @@ yum -y install -y epel-release bzip2 dmidecode gcc-c++ ncurses-devel libxml2-dev
 #download Asterisk
 cd /usr/src
 wget http://downloads.asterisk.org/pub/telephony/asterisk/old-releases/asterisk-$AST_VERSION.tar.gz
-tar -zxf asterisk-$AST_VERSION.tar.gz && cd asterisk-$AST_VERSION
+tar -zxf asterisk-$AST_VERSION.tar.gz && cd asterisk*
 
 #remove RPM version of pjproject from pre-requisites install script
 sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
