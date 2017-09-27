@@ -21,7 +21,7 @@ CRT_KEY=''
 GOOGLE='stun4.l.google.com:19302'
 
 #Asterisk version
-AST_VERSION=14.6.0-rc1
+AST_VERSION=14.6.0
 
 #Hostname command suggestion
 HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
@@ -186,6 +186,8 @@ sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 sed -i -e 's/.sample_rate = 1000,//g' main/codec_builtin.c
 #remove timestamp from frame
 sed -i -e '4975,4976d' res/res_rtp_asterisk.c
+#update PJSIP_MAX_PCKT_LEN to aviod buffer overflow
+sed -i -e 's/6000/12440/' third-party/pjproject/patches/config_site.h
 
 #install PJSIP and asterisk
 
