@@ -12,7 +12,7 @@ The Asterisk for ACE Direct configuration assumes the following:
 
 ## Download/Configure
 
-Once Asterisk and PJSIP has been installed on a server, pull down the repo containing the ACE Direct configs and media:
+Once Asterisk and PJSIP has been installed on a server (see the "Automation" section below), pull down the repo containing the ACE Direct configs and media:
 
 
 ```sh
