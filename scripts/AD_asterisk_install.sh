@@ -1,7 +1,7 @@
 ###############################
 #
 #Example use:
-# ./AD_asterisk_install.sh --public-ip 54.242.111.146 --local-ip 172.21.1.86 --stun-server newstun.task3acrdemo.com:3478 --dialin 12345 --crt-file #"\/etc\/asterisk\/keys\/asterisk.crt" --crt-key "\/etc\/asterisk\/keys\/asterisk.key"
+# ./AD_asterisk_install.sh --public-ip 54.242.111.146 --local-ip 172.21.1.86 --stun-server stun.task3acrdemo.com:3478 --dialin 12345 --crt-file #"\/etc\/asterisk\/keys\/asterisk.crt" --crt-key "\/etc\/asterisk\/keys\/asterisk.key"
 ###############################
 
 #!/bin/bash
