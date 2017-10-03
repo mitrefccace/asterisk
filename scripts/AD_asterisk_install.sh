@@ -224,7 +224,7 @@ cd /etc/asterisk
 sed -i -e "s/<public_ip>/$PUBLIC_IP/g" pjsip.conf
 sed -i -e "s/<local_ip>/$LOCAL_IP/g" pjsip.conf
 sed -i -e "s/<dialin>/$DIALIN/g" extensions.conf pjsip.conf
-sed -i -e "s/<stun_server>/$STUN_SERVER/g" rtp.conf
+sed -i -e "s/<stun_server>/$STUN_SERVER/g" rtp.conf res_stun_monitor.conf
 sed -i -e "s/<crt_file>/$CRT_FILE/g" http.conf pjsip.conf
 sed -i -e "s/<crt_key>/$CRT_KEY/g" http.conf pjsip.conf
 sed -i -e "s/<ss_cert>/\/etc\/asterisk\/keys\/asterisk.pem/g" pjsip.conf
