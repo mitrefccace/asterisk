@@ -17,6 +17,14 @@
 # Authors: Joe Gruessing and Said Masoud
 #
 
+# provider URIs
+CONVO="sbc.sip.convorelay.net"
+PURPLE="vrs-bgw.prod.purple.us"
+GLOBAL="globalvrs.tv"
+SORENSON="p.ci.svrs.net"
+SORENSON2="p2.ci.svrs.net"
+ZVRS="sbc.prod.champvrs.com"
+
 ITRSIP="156.154.59.67"
 PHONENUM=$1
 
@@ -65,5 +73,24 @@ fi
 
 
 SIPHOST="`echo $SIPURI3| cut -f8 -d\ |rev|cut -c 2-|rev`"
+
+#loop through provider URIs, and set the Asterisk variable on the one that matches
+#the current phone number being queried
+
+if [ $SIPHOST == $CONVO ]; then
+        echo "SET VARIABLE endpoint Convo"
+elif [ $SIPHOST == $PURPLE ]; then
+        echo "SET VARIABLE endpoint Purple"
+elif [ $SIPHOST == $GLOBAL ]; then
+        echo "SET VARIABLE endpoint Global"
+elif [ $SIPHOST == $SORENSON ]; then
+        echo "SET VARIABLE endpoint Sorenson"
+elif [ $SIPHOST == $SORENSON2 ]; then
+        echo "SET VARIABLE endpoint Sorenson2"
+elif [ $SIPHOST == $ZVRS ]; then
+        echo "SET VARIABLE endpoint ZVRS"
+fi
+
+
 echo "port is $SIPPORT"
 echo "SET VARIABLE uri $SIPHOST:$SIPPORT"
