@@ -86,7 +86,7 @@ elif [ $SIPHOST == $GLOBAL ]; then
 elif [ $SIPHOST == $SORENSON ]; then
         echo "SET VARIABLE endpoint Sorenson"
 elif [ $SIPHOST == $SORENSON2 ]; then
-        echo "SET VARIABLE endpoint Sorenson2"
+        echo "SET VARIABLE endpoint Sorenson"
 elif [ $SIPHOST == $ZVRS ]; then
         echo "SET VARIABLE endpoint ZVRS"
 fi
