@@ -1,6 +1,6 @@
 # **Asterisk for ACE Direct Installation script**
 
-The script in this directory will automate the installation and configuration of Asterisk for ACE Direct. This script has been developed for use on a CentOS 7.3.x server, and support for earlier versions are not guaranteed. It will perform the following:
+The AD_asterisk_install.sh script in this directory will automate the installation and configuration of Asterisk for ACE Direct. This script has been developed for use on a CentOS 7.3.x server, and support for earlier versions are not guaranteed. It will perform the following:
 
 * Checks for SElinux and IPv6. Script fails if either are detected
 * Include default parameters for STUN server, dial-in, and SSL certs if none are provided

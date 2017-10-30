@@ -177,7 +177,7 @@ sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 ./contrib/scripts/install_prereq install
 
 
-#the following code modifications reverse the commits made below,
+#The next two commands contain code modifications reverses the below commit,
 #and are needed to enable proper video RTP with provider devices.
 #Commit: https://gerrit.asterisk.org/#/c/3899/
 #Asterisk issue: https://issues.asterisk.org/jira/browse/ASTERISK-26554
@@ -186,6 +186,7 @@ sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 sed -i -e 's/.sample_rate = 1000,//g' main/codec_builtin.c
 #remove timestamp from frame
 sed -i -e '4975,4976d' res/res_rtp_asterisk.c
+
 #update PJSIP_MAX_PCKT_LEN to aviod buffer overflow
 sed -i -e 's/6000/12440/' third-party/pjproject/patches/config_site.h
 
@@ -204,7 +205,7 @@ echo "Generating the Asterisk self-signed certificates. You will be prompted to 
 sleep 2
 
 #generate TIS certificates
-./contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE direct" -d /etc/asterisk/keys
+./contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 
 # pull down confi/media files and add to /etc/asterisk and /var/lib/asterisk/sounds, respectively
 cd ~

@@ -1,6 +1,6 @@
 # **Asterisk for ACE Direct Project**
 
-This repository is to be used in conjunction with the documentation for the ACE Direct project (found on the project's [main page](https://github.com/FCC/ACEDirect/tree/master/docs)). The two directories contain configuration files for Asterisk, as well as the media files used for this version of Asterisk.
+This repository is to be used in conjunction with the documentation for the ACE Direct project (found on the project's [main page](https://github.com/FCC/ACEDirect/tree/master/docs)). The two directories contain configuration files for Asterisk, as well as the media files used for this version of Asterisk. Please read this entire document before installing Asterisk for ACE Direct.
 
 ## Prerequisites
 
@@ -71,18 +71,18 @@ Some Asterisk modules have been enabled/disabled in the modules.conf file. Notab
 * res_musiconhold.so: loaded for music-on-hold capability for queues
 * res_pjsip.so: loaded so PJSIP stack can be used
 * chan_skinny.so: Skinny protocol for Cisco phones. Disabled because this causes Asterisk to listen to TCP connections on port 2000
-* cel_pgsq.so: It appears that Asterisk v.14.4.0 trues to connect to PostgreSQL by default, and would cause error messages to be logged to the Asterisk console. Since ACE Direct uses MySQL, this module has been disbaled.
+* cel_pgsq.so: It appears that Asterisk v.14.4.0 and above tries to connect to PostgreSQL by default, and would cause error messages to be logged to the Asterisk console. Since ACE Direct uses MySQL, this module has been disbaled.
 * chan_sip.so: disabled so PJSIP stack can be used
-* cdr_odbc.so: For some reason, this module causes duplicate records to be written to the CDR database. So, it is disabled. More info: https://stackoverflow.com/a/41740187/7057875
+* cdr_odbc.so: For some reason, this module causes duplicate records to be written to the CDR database. Therefore, it is disabled. More info: https://stackoverflow.com/a/41740187/7057875
 
-If you want/need any of these modules, feel free to modify the modules.conf file.
+If you want/need any of these modules, feel free to modify the /etc/asterisk/modules.conf file.
 
 ## User-specific Configurations
 
 There are some user-specific configurations that must be performed before using Asterisk:
 
 * In pjsip.conf, each extension has a placeholder for the password used to register to the extension (typically "<password>"). These placeholders should be updated with the passwords chosen by each agent corresponding to the respective extension. The passwords for the WebRTC extensions should all be the same.
-* In manager.conf, the password for the AMI interface should be set as well.
+* In manager.conf, the password for the AMI interface should be changed as well.
 * Each agent should have an entry at the end of agents.conf. The "fullname" attribute for each agent is optional. Currently, agents.conf has four agent entries which correspond to the default agent extensions, and should be updated as needed.
 
 ## Automation
