@@ -119,7 +119,7 @@ fi
 #check for IPv6 and SElinux
 
 DISABLED="disabled"
-SESTATUS=$(sestatus | grep "Current mode" | awk '{print $3}')
+SESTATUS=$(sestatus | head -1 | awk '{print $3}')
 IPV6=$(cat /proc/net/if_inet6)
 
 if [ $SESTATUS != $DISABLED ]
