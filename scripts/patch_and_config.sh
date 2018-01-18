@@ -136,6 +136,7 @@ function error_check_time {
 	strLength=$(echo -n $1 | wc -m)
 	if [[ $strLength != 5 ]]; then
 		echo "fail"
+	# check for ':' format
 	elif [[ $1 == *":"* ]]; then
 		re='^[0-9]+$'
 		hour=$(echo $1 | cut -d ':' -f 1)
@@ -149,6 +150,8 @@ function error_check_time {
 		else
 			echo "pass"
 		fi
+	else
+		echo "fail"
 	fi	
 }
 
@@ -390,18 +393,19 @@ function install_configs {
 		problem=false
 		for code in ${exitCodes[@]}
 		do
-			if [[ $code == 1 ]]; then
+			echo $code
+			if [[ $code == "1" ]]; then
 				problem=true
 				configStatus=false
 				break
 			fi
 		done
 
-		if [[ !problem ]]; then
-			print_message "Notify" "modified pjsip.conf successfully"
-		else
+		if [[ $problem == "true" ]]; then
 			print_message "Error" "there was a problem modifying pjsip.conf"
 			configStatus=false
+		else
+			print_message "Notify" "modified pjsip.conf successfully"
 		fi
 
 		# change the phone number associated with Asterisk for inbound calls from provider devices
@@ -416,7 +420,7 @@ function install_configs {
 		#fi
 	else
 		# handle the error
-		print_message "Error" "could not resolve hostname ---> Installation failed"
+		print_message "Error" "could not resolve IP address ---> Installation failed"
 		exit 1
 	fi
 
