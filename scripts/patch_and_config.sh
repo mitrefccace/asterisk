@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------
 # Author   : Connor McCann
 # Project  : Ace Direct Asterisk Configuration 
-# Date     : 3 Jan 2017
+# Date     : 18 Jan 2017
 # Purpose  : To automate patches and the installation of Asterisk configuration 
 #            files on various Ace Direct servers. This script will adjust pjsip.conf
 #	     and extensions.conf for the phone number, external media address
@@ -134,26 +134,23 @@ function error_check_args {
 }
 
 function error_check_time {
-	strLength=$(echo -n $1 | wc -m)
-	re='^[0-9]+$'
-	if [[ $1 == *":"* ]]; then
-		hour=$(echo $1 | cut -d ':' -f 1)
-		min=$(echo $1 | cut -d ':' -f 2)
-	else
-		echo "fail"
-		exit
-	fi
 	# check the length
+	strLength=$(echo -n $1 | wc -m)
 	if [[ $strLength != 5 ]]; then
 		echo "fail"
-	# check the hour
-	elif ! [[ $hour =~ $re ]]; then
-		echo "fail"
-	# check the minutes
-	elif ! [[ $min =~ $re ]]; then
-		echo "fail"
-	else
-		echo "pass"
+	elif [[ $1 == *":"* ]]; then
+		re='^[0-9]+$'
+		hour=$(echo $1 | cut -d ':' -f 1)
+		min=$(echo $1 | cut -d ':' -f 2)
+		# check the hour
+		if ! [[ $hour =~ $re ]]; then
+			echo "fail"
+		# check the minutes
+		elif ! [[ $min =~ $re ]]; then
+			echo "fail"
+		else
+			echo "pass"
+		fi
 	fi	
 }
 
@@ -183,30 +180,31 @@ function error_check_domain {
 	print_message "Notify" "$1 will now be used within pjsip.conf"
 }
 
-function apply_patches {
-        # make sure asterisk-ace-direct repo is present
-        declare -a AD
-        AD=$(find / -name 'asterisk-ace-direct')
-
-        if [[ $AD == "" ]]; then
+function find_dir {
+	# make sure asterisk-ace-direct repo is present
+        echo $1
+	dirs_string=$(find / -type d -name $1)
+	read -a AD <<<$dirs_string
+        
+	if [[ $AD == "" ]]; then
                 print_message "Error" "please clone asterisk-ace-direct repository first ---> exiting program"
                 exit 1
         fi
-        num_AD=$(find / -name 'asterisk-ace-direct' | wc -l)
+        num_AD=$(find / -type d -name 'asterisk*' | wc -l)
 
         # handle multiple dirs
         if [[ $num_AD > 1 ]]; then
                 print_message "Notify" "several directories have been found..."
                 let index=0
 
-                for dir in $AD
+                for dir in ${AD[@]}
                 do
                         echo "$index : $dir"
                         let index++
                 done
 
                 # accept user input for row/dir number
-                printf "Please select which row number is the proper directory (0-indexed):\t"
+                printf "Please select which row number is the proper directory (0-indexed): "
                 read index
 
                 # make sure the user entered a number
@@ -216,18 +214,35 @@ function apply_patches {
                         printf "Incorrect value...please select which row number is the proper directory (0-indexed):\t"
                         read index
                 done
-                AD=${AD[$index]}
-                print_message "Notify" "selecting $AD"
+                
+		AD=${AD[$index]}
+		print_message "Notify" "selecting ${AD}"
+		
+		# return 
+		echo $AD
         fi
+}
 
-        # find the location of Asterisk 15.1.2
+function apply_patches {
+        # check that we are in the proper directory 
+	currentPath=$(pwd)
+	currentDir=$(basename $currentPath)
+        if ! [[ $currentDir == "scripts" ]]; then
+		print_message "Error" "you are nto executing this script from the proper scripts directoty ---> Installation failed."
+		exit 1
+	else
+		AD=$(dirname $currentPath)
+	fi
+	# find the location of Asterisk 15.1.2
         versionNum=$2
 	if [[ $versionNum == "" ]]; then
-		printf "Please enter an Asterisk version number:\t"
+		printf "Please enter an Asterisk version number: "
 		read versionNum
 	fi
 
-	asteriskPath=$(find / -name "asterisk-${versionNum}")
+	asteriskPath=$(find / -type d -name "asterisk-${versionNum}")
+	#dirName="asterisk-${versionNum}"
+	#asteriskPath=$(find_dir $dirName)
 	if [[ $asteriskPath == "" ]]; then
 		print_message "Error" "did not find that version of Asterisk anywhere ---> exiting program"
 		exit 1
@@ -288,8 +303,8 @@ function apply_patches {
 			make && make install
 			ldconfig
 			# move back into the AD repo
-			print_message "Notify" "moving back into ${AD}"
-			cd $AD
+			print_message "Notify" "moving back into ${AD}/scripts"
+			cd "$AD/scripts"
                 else
                         # handle no 
                         print_message "Notify" "aborting the build process ---> Pacthes applied but source not built"
@@ -298,6 +313,14 @@ function apply_patches {
 }
 
 function install_configs {
+	# check that we are in the proper directory 
+	AD=$(pwd)
+	current_dir=$(basename $AD)
+        if ! [[ $current_dir == "scripts" ]]; then
+		print_message "Error" "you are nto executing this script from the proper scripts directoty ---> Installation failed."
+		exit 1
+	fi
+	# check for the hostname
 	hostName=$(hostname)
 	if [[ $hostName == "" ]]; then 
 		# get the hostname from the user
@@ -305,7 +328,6 @@ function install_configs {
 		read hostName
 	fi
 	error_check_domain $hostName
-			
 	# the new information
 	newNum=$1
 	if [[ $newNum  == "" ]]; then
@@ -331,25 +353,41 @@ function install_configs {
 		declare -a exitCodes
 		let index=0
 
-		# modify the files with vim
+		# modify the files with sed
 		mkdir temp
-		cp ./configs/pjsip.conf ./configs/extensions.conf ./temp
-		
-		# change the external media address
-		sed -i "s/external_media_address=*.*.*.*/external_media_address=${newIP}/g" ./temp/pjsip.conf && \
-		sed -i "s/media_address=*.*.*.*/media_address=${newIP}/g" ./temp/pjsip.conf && \
-		sed -i "s/external_signaling_address=*.*.*.*/external_signaling_address=${newIP}/g" ./temp/pjsip.conf && \
-		sed -i "s/bind_rtp_to_media_address=*.*.*.*/bind_rtp_to_media_address=${newIP}/g" ./temp/pjsip.conf
-		
+		cp ../config/pjsip.conf ./temp
+		cp ../config/rtp.conf ./temp
+		cp ../config/res_stun_monitor.conf ./temp
+		cp ../config/http.conf ./temp
+
+		# change the public ip address
+		sed -i -e "s/<public_ip>/${newIP}/g" ./temp/pjsip.conf
 		exitCodes[$index]=$?
 		let index++
 	
-		# change the local net address
-		sed -i "s/local_net=*.*.*.*/local_net=${newLocalNet}/g" ./temp/pjsip.conf
-		
+		# change the local ip address
+		sed -i -e "s/<local_ip>/${newLocalNet}/g" ./temp/pjsip.conf
 		exitCodes[$index]=$?
 		let index++
-
+		
+		# change stun server
+		stun="stun.task3acrdemo.com"
+		sed -i -e "s/<stun_server>/$stun/g" ./temp/rtp.conf ./temp/res_stun_monitor.conf
+		exitCodes[$index]=$?
+		let index++
+		
+		# change the cert file
+		certPath="\/etc\/asterisk\/keys\/star.pem"
+		sed -i -e "s/<crt_file>/$certPath/g" ./temp/pjsip.conf ./temp/http.conf
+		exitCodes[$index]=$?
+		let index++
+		
+		#change the cert key
+		keyPath="\/etc\/asterisk\/keys\/star.key"
+		sed -i -e "s/<crt_key>/$keyPath/g" ./temp/pjsip.conf ./temp/http.conf
+		exitCodes[$index]=$?
+		let index++
+		
 		# alert user if mods to pjsip.conf were successfull
 		problem=false
 		for code in ${exitCodes[@]}
@@ -369,15 +407,15 @@ function install_configs {
 		fi
 
 		# change the phone number associated with Asterisk for inbound calls from provider devices
-		sed -i "s/[0-9]\{10\}/${newNum}/g" ./temp/extensions.conf 
+		#sed -i "s/[0-9]\{10\}/${newNum}/g" ./temp/extensions.conf 
 		
 		# alert user if mods to extensions.conf were successfull
-		if [[ $? == 0 ]]; then
-			print_message "Notify" "modified extensions.conf successfully"
-		else
-			print_message "Error" "there was a problem modifying extensions.conf"
-			configStatus=false
-		fi
+		#if [[ $? == 0 ]]; then
+		#	print_message "Notify" "modified extensions.conf successfully"
+		#else
+		#	print_message "Error" "there was a problem modifying extensions.conf"
+		#	configStatus=false
+		#fi
 	else
 		# handle the error
 		print_message "Error" "could not resolve hostname ---> Installation failed"
@@ -385,18 +423,28 @@ function install_configs {
 	fi
 
 	# replace the asterisk config files
-	cp ./temp/pjsip.conf /etc/asterisk/
-	cp ./temp/extensions.conf /etc/asterisk/
+	cp ./temp/pjsip.conf /etc/asterisk
+	cp ./temp/rtp.conf /etc/asterisk
+	cp ./temp/res_stun_monitor.conf /etc/asterisk
+	cp ./temp/http.conf /etc/asterisk
+	#cp ./temp/extensions.conf /etc/asterisk/
 
 	if [[ $? == 0 ]]; then
-		print_message "Notify" "copied ./configs/pjsip.conf ---> /etc/asterisk/"
-		print_message "Notify" "copied ./configs/extensions.conf ---> /etc/asterisk/"
+		print_message "Notify" "copied ./config/pjsip.conf ---> /etc/asterisk/"
+		print_message "Notify" "copied ./config/rtp.conf ---> /etc/asterisk/"
+		print_message "Notify" "copied ./config/res_stun_monitor.conf ---> /etc/asterisk/"
+		print_message "Notify" "copied ./config/http.conf ---> /etc/asterisk/"
+		echo "============================================================================="
+		#print_message "Notify" "copied ./configs/extensions.conf ---> /etc/asterisk/"
 	else
 		configStatus=false
 	fi
 
 	# replace the rest of the configuration files
-	configFiles=$(find ./ -name '*.conf' -and -not -name 'pjsip.*' -and -not -name 'extensions.*')
+	configFiles=$(find ../ -name '*.conf' -and -not -name 'pjsip.conf'\
+					      -and -not -name 'rtp.conf'\
+					      -and -not -name 'res_stun_monitor.conf'\
+					      -and -not -name 'http.conf')
 	for file in $configFiles
 	do
 		cp $file /etc/asterisk/
@@ -408,7 +456,7 @@ function install_configs {
 	done
 	
 	# clean up
-	sudo rm -r ./temp
+	rm -rf ./temp
 
 	# setup complete
 	if [[ $configStatus == "true" ]]; then
@@ -491,7 +539,7 @@ function init_ast_db {
 			read end_time
 			rez=$(error_check_time $end_time)
 		done
-		rez=$(asterisk -rx "database put BUSINESS_HOURS END ${start_time}")
+		rez=$(asterisk -rx "database put BUSINESS_HOURS END ${end_time}")
 		if [[ $rez == "Updated database successfully" ]]; then
 			print_message "Success" "business hours end time <${end_time}>  has been added to the Asterisk database"
 		else
