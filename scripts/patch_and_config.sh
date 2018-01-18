@@ -5,9 +5,7 @@
 # Project  : Ace Direct Asterisk Configuration 
 # Date     : 18 Jan 2017
 # Purpose  : To automate patches and the installation of Asterisk configuration 
-#            files on various Ace Direct servers. This script will adjust pjsip.conf
-#	     and extensions.conf for the phone number, external media address
-#	     and local net address unique to each AWS EC2 instance. 
+#            files on various Ace Direct servers.
 #----------------------------------------------------------------------------
 
 function show_instructions {
