@@ -60,22 +60,15 @@ $ ./AD_asterisk_install.sh --public-ip 8.8.8.8 --local-ip 10.0.0.1 --stun-server
 
 Note the format of the CA cert and key, namely using '\/' to represent directory structure and surrounding the entire parameter in double quotes. This format is important as the script uses the sed command to replace te placeholder values in the Asterisk config files.
 
-### patch_and_config.sh Instructions
-----------------------------------
+--------------------------------------------
+
+## patch_and_config.sh Instructions
 1. Clone this repo to the destination. 
 2. Move into __asterisk-ace-direct/__.
 3. Execute `sudo su` 
-4. Execute one of the following commands:  
+4. Execute script  
 
-|                 Command                                            | Purpose                                                                                  |
-| -------------------------------------------------------------------| -----------------------------------------------------------------------------------------|
-| `$ ./patch_and_config.sh --help`                                   | Provides instructions                                                                    |
-| `$ ./patch_and_config.sh --version 15.1.2 --patch --build`         | Applies patches to asterisk-15.1.2 source code and then rebuilds it                      |
-| `$ ./patch_and_config.sh --config --dialin 8003671294`             | Installs the configuration files using the provided phone number                         |
-| `$ ./patch_and_config.sh --patch --build --config --restart --cli` | Applies the patches, rebuilds the source, restarts Asterisk and starts the CLI           |
-
-### Configuration Files
------------------------------------------
+## Configuration files
 ##### Variables
 * The __external_media_address__ parameter within __pjsip.conf__ requires modification. 
 This script utilizes the machine's hostname to determine the external IP address. If
@@ -89,26 +82,25 @@ user will be asked to enter the phone number before proceeding.
 entries for the dialin number and both the start and end times for the call center. If any 
 of the values are null, the user will be queried. 
 
-##### Error Checking
+##### Error checking
 * The domian name is checked to make sure the __dig__ command can resolve the address. 
 If not, it returns an error. 
 * The phone number is validated by checking that it is composed of only numbers [0-9] 
 and contains only 10 total digits. If not, it returns an error.
 * The start and end times are evaluated to make sure they are in the proper ##:## format.
 
-##### File Modifications
+##### File modifications
 * These are made by executing sed commands to perform a search and replace on the files.
 * The modifications are made within a temporary directory so that the original files are 
 not altered. 
 
-##### Clean Up
+##### Clean up
 * The modified files are first copied into __/etc/asterisk/__.
 * Then the temporary directory is removed.
 * If the __--restart__ option is selected, Asterisk will be restarted. 
 * If the __--cli__ option is selected, the Command Line Interface for Asterisk will launch. 
 
-### Patch Files
-----------------------------------
+## Patch files
 
 ##### Input
 * Very little user input is required. At most, it queries the user to make sure they wish to 
@@ -125,3 +117,11 @@ __foo.c__ source file within the __Asterisk-x.x.x__ directory. If the file is no
 using the __make__ commands. Just add the __--build__ to execute these commands and build 
 the project after applying the patches.
 
+## Example usage
+
+```sh
+$ ./patch_and_config.sh --version 15.1.2 --patch --build --config --restart --cli
+
+```
+* The example above will look for asterisk-15.1.2 repo so it can apply the patch files within that directory and then
+rebuild the source. Afterwards, it will handle the replacement of the configuration files, restart, and launch the Asterisk CLI.
