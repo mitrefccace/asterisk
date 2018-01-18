@@ -393,7 +393,6 @@ function install_configs {
 		problem=false
 		for code in ${exitCodes[@]}
 		do
-			echo $code
 			if [[ $code == "1" ]]; then
 				problem=true
 				configStatus=false
