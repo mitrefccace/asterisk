@@ -33,11 +33,11 @@ The Asterisk for ACE Direct configuration assumes the following:
 * <crt_file>: CA cert file for server. Generated self-signed cert is used if none is provided.
 * <crt_key>: Private key for CA cert
 
-##Twilio
+## Twilio
 
 You can configure Twilio for use with Asterisk to route PSTN (i.e. non-VRS) calls to/from Asterisk. the extensions.conf and pjsip.conf files have configurations set for use with Twilio; however, they will not work unless you replace the <twilio_URI> placeholder in pjsip.conf with the Twilio termination URI of your SIP trunk. If it is not desired to use Twilio with ACE Direct, simply delete the sections of the dial-plan and SIP config that pertain to Asterisk. For more information on using Twilio with Asterisk, [download the Twilio docs](https://www.twilio.com/docs/documents/35/AsteriskTwilioSIPTrunkingv2_1.pdf).
 
-##Identity Management
+## Identity Management
 
 The pjsip.conf file defines user profiles that can be used to register to Asterisk. Each user profile has a password associated with it.
 Before starting and using Asterisk, IT IS HIGHLY RECOMMENDED to change the passwords fo each user account that will be used, as well as removing the ones that won't be used. Each password attribute currently has the placeholder <password> set in it. This is not recommended,
@@ -64,7 +64,7 @@ Note the format of the CA cert and key, namely using '\/' to represent directory
 
 ## patch_and_config.sh Instructions
 1. Clone this repo to the destination. 
-2. Move into __asterisk-ace-direct/__.
+2. Move into __asterisk__.
 3. Execute `sudo su` 
 4. Execute script  
 
@@ -123,5 +123,5 @@ the project after applying the patches.
 $ ./patch_and_config.sh --version 15.1.2 --patch --build --config --restart --cli
 
 ```
-* The example above will look for asterisk-15.1.2 repo so it can apply the patch files within that directory and then
-rebuild the source. Afterwards, it will handle the replacement of the configuration files, restart, and launch the Asterisk CLI.
+* The example above will look for the asterisk-15.1.2 repository so that it can apply the patch files then rebuild
+the source. Afterwards, it will handle the replacement of the configuration files, restart, and launch the Asterisk CLI.
