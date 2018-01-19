@@ -83,7 +83,7 @@ entries for the dialin number and both the start and end times for the call cent
 of the values are null, the user will be queried. 
 
 ##### Error checking
-* The domian name is checked to make sure the __dig__ command can resolve the address. 
+* The domain name is checked to make sure the __dig__ command can resolve the address. 
 If not, it returns an error. 
 * The phone number is validated by checking that it is composed of only numbers [0-9] 
 and contains only 10 total digits. If not, it returns an error.

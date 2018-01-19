@@ -10,7 +10,7 @@
 
 function show_instructions {
 		echo
-		echo "+--------------------------------------------------------------------------------------------------+"
+		echo "+-------------------------------------------------------------------------------------------------+"
 		echo "+ Run this script if:                                                                             +"
 		echo "+                      1. You would like to apply patches to Asterisk source code                 +"
 		echo "+                      2. You would like to install the configuration files to /etc/asterisk/     +"
@@ -18,14 +18,14 @@ function show_instructions {
 		echo "+                                                                                                 +"
 		echo "+ ./patch_and_config.sh [Required_Flag] [Optional_Flag]                                           +"
 		echo "+                                                                                                 +"
-		echo "+            --help    : Optional : Displays these program instructions                           +"
-		echo "+            --patch   : Required : Applies patch files to source code                            +"
-		echo "+            --config  : Required : Copies configuration files into /etc/asterisk/                +"
-		echo "+            --version : Required : Specifies which version of Asterisk to look for               +"
-		echo "+            --build   : Optional : Builds the source code                                        +"
-		echo "+            --restart : Optional : Restarts Asterisk                                             +"
-		echo "+            --cli     : Optional : Launches Asterisk CLI upon completion                         +"
-		echo "+            --dialin  : Optional : Takes phone number as next argument                           +"
+		echo "+            --help     : Optional : Displays these program instructions                          +"
+		echo "+            --patch    : Required : Applies patch files to source code                           +"
+		echo "+            --config   : Required : Copies configuration files into /etc/asterisk/               +"
+		echo "+            --version  : Required : Specifies which version of Asterisk to look for              +"
+		echo "+            --no-build : Optional : Opts not to build the source code                            +"
+		echo "+            --restart  : Optional : Restarts Asterisk                                            +"
+		echo "+            --cli      : Optional : Launches Asterisk CLI upon completion                        +"
+		echo "+            --dialin   : Optional : Takes phone number as next argument                          +"
 		echo "+-------------------------------------------------------------------------------------------------+"
 		echo
 }
@@ -61,7 +61,7 @@ function error_check_args {
         # parse all of the input arguments
 	patch=false
 	config=false
-	build=false
+	build=true
 	restartArg=false
         cliArg=false
 	nextIsNum=false
@@ -95,8 +95,8 @@ function error_check_args {
 			--version)
 				nextIsVersion=true
 				;;
-			--build)
-				build=true
+			--no-build)
+				build=false
 				;;
 			--restart)
                                 restartArg=true
@@ -237,8 +237,9 @@ function apply_patches {
 	# find the location of Asterisk 15.1.2
         versionNum=$2
 	if [[ $versionNum == "" ]]; then
-		printf "Please enter an Asterisk version number: "
-		read versionNum
+		#printf "Please enter an Asterisk version number: "
+		#read versionNum
+		versionNum="15.1.2"
 	fi
 
 	asteriskPath=$(find / -type d -name "asterisk-${versionNum}")
@@ -344,6 +345,7 @@ function install_configs {
 	fi
 
 	newIP=$(dig +short ${hostName})
+	# WARNING -- the following line could pose a problem to 'dual-homed' servers
 	newLocalNet=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
 
 	if [[ ${newIP} != "" ]] && [[ ${newLocalNet} != "" ]]; then
