@@ -33,11 +33,11 @@ The Asterisk for ACE Direct configuration assumes the following:
 * <crt_file>: CA cert file for server. Generated self-signed cert is used if none is provided.
 * <crt_key>: Private key for CA cert
 
-##Twilio
+## Twilio
 
 You can configure Twilio for use with Asterisk to route PSTN (i.e. non-VRS) calls to/from Asterisk. the extensions.conf and pjsip.conf files have configurations set for use with Twilio; however, they will not work unless you replace the <twilio_URI> placeholder in pjsip.conf with the Twilio termination URI of your SIP trunk. If it is not desired to use Twilio with ACE Direct, simply delete the sections of the dial-plan and SIP config that pertain to Asterisk. For more information on using Twilio with Asterisk, [download the Twilio docs](https://www.twilio.com/docs/documents/35/AsteriskTwilioSIPTrunkingv2_1.pdf).
 
-##Identity Management
+## Identity Management
 
 The pjsip.conf file defines user profiles that can be used to register to Asterisk. Each user profile has a password associated with it.
 Before starting and using Asterisk, IT IS HIGHLY RECOMMENDED to change the passwords fo each user account that will be used, as well as removing the ones that won't be used. Each password attribute currently has the placeholder <password> set in it. This is not recommended,
@@ -59,3 +59,69 @@ $ ./AD_asterisk_install.sh --public-ip 8.8.8.8 --local-ip 10.0.0.1 --stun-server
 ```
 
 Note the format of the CA cert and key, namely using '\/' to represent directory structure and surrounding the entire parameter in double quotes. This format is important as the script uses the sed command to replace te placeholder values in the Asterisk config files.
+
+--------------------------------------------
+
+## patch_and_config.sh Instructions
+1. Clone this repo to the destination. 
+2. Move into __asterisk__.
+3. Execute `sudo su` 
+4. Execute script  
+
+## Configuration files
+##### Variables
+* The __external_media_address__ parameter within __pjsip.conf__ requires modification. 
+This script utilizes the machine's hostname to determine the external IP address. If
+this value is null, it will query the user to input the proper domain name.
+* The __local_net__ parameter will be set using the __ifconfig__ tool. 
+* The phone number for the server must be modified within __extensions.conf__. 
+This can be supplied with the __--dialin__ flag. Otherwise, it quereis the Asterisk
+databse for the dialin number. If this value is null or has not been configured, then the 
+user will be asked to enter the phone number before proceeding. 
+* Additionally, everytime this program is run, it will check that the Asterisk DB contains 
+entries for the dialin number and both the start and end times for the call center. If any 
+of the values are null, the user will be queried. 
+
+##### Error checking
+* The domain name is checked to make sure the __dig__ command can resolve the address. 
+If not, it returns an error. 
+* The phone number is validated by checking that it is composed of only numbers [0-9] 
+and contains only 10 total digits. If not, it returns an error.
+* The start and end times are evaluated to make sure they are in the proper ##:## format.
+
+##### File modifications
+* These are made by executing sed commands to perform a search and replace on the files.
+* The modifications are made within a temporary directory so that the original files are 
+not altered. 
+
+##### Clean up
+* The modified files are first copied into __/etc/asterisk/__.
+* Then the temporary directory is removed.
+* If the __--restart__ option is selected, Asterisk will be restarted. 
+* If the __--cli__ option is selected, the Command Line Interface for Asterisk will launch. 
+
+## Patch files
+
+##### Input
+* Very little user input is required. At most, it queries the user to make sure they wish to 
+continue with a particular step. If the patch has already been applied then answer [n] for __no__ 
+so that the reverse patch is not applied. If you do not specify the Asterisk version number when 
+running, then you will be prompted for this information. 
+
+##### Process
+* The script functions by determining which files to patch by searching for the __asterisk-ace-direct__ 
+repo in the file system.
+* Once there, it reads patch files such as __foo.c.patch__ within the patch directory and searches for the 
+__foo.c__ source file within the __Asterisk-x.x.x__ directory. If the file is not found, it will alert the user. 
+* After the patches have been applied with the __patch__ command, the Asterisk source code may be recompiled 
+using the __make__ commands. Just add the __--build__ to execute these commands and build 
+the project after applying the patches.
+
+## Example usage
+
+```sh
+$ ./patch_and_config.sh --version 15.1.2 --patch --build --config --restart --cli
+
+```
+* The example above will look for the asterisk-15.1.2 repository so that it can apply the patch files then rebuild
+the source. Afterwards, it will handle the replacement of the configuration files, restart, and launch the Asterisk CLI.

@@ -9,6 +9,10 @@
 #This will stop the script if any of the commands fail
 set -e
 
+# cjm-jan18
+source /etc/environment
+startPath=$(pwd)
+
 #set variable names
 PUBLIC_IP=''
 LOCAL_IP=''
@@ -197,9 +201,11 @@ sleep 2
 ./contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 
 # pull down confi/media files and add to /etc/asterisk and /var/lib/asterisk/sounds, respectively
-cd ~
-git clone $GIT_URL
-cd asterisk
+#cd ~
+#git clone $GIT_URL
+#cd /home/centos/asterisk-codev
+repo=$(dirname $startPath)
+cd $repo
 yes | cp -rf config/* /etc/asterisk
 yes | cp -rf media/* /var/lib/asterisk/sounds/
 
