@@ -454,6 +454,7 @@ function install_configs {
 		if [[ $? == 0 ]]; then
 			print_message "Notify" "copied ${file} ---> /etc/asterisk/"
 		else
+			print_message "Error" "failed to copy ${file} ---> /etc/asterisk/"
 			configStatus=false
 		fi
 	done
