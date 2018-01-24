@@ -118,7 +118,7 @@ function error_check_args {
 	
 	# run patchfunction 
 	if [[ $patch == "true" ]]; then
-		apply_patches $build $version	
+		apply_asterisk_patches $build $version	
 	fi
 
 	# run installation function
@@ -224,7 +224,7 @@ function find_dir {
         fi
 }
 
-function apply_patches {
+function apply_asterisk_patches {
         # check that we are in the proper directory 
 	currentPath=$(pwd)
 	currentDir=$(basename $currentPath)
