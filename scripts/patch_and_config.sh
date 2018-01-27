@@ -335,15 +335,19 @@ function install_configs {
 	if [[ $newNum  == "" ]]; then
 		# try to query asterisk db for call center phone number
 		newNum=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
-	fi
-	output=$(error_check_num $newNum)
-	if [[ $output == "fail" ]]; then
-		print_message "Error" "the number you have entered is improper format ---> Installation failed"
-		exit 1
-	elif [[ $output == "pass" ]]; then
 		print_message "Notify" "${newNum} will now be used within extenstions.conf"
+	else
+		# uodate DB with valid new number
+		output=$(error_check_num $newNum)
+		if [[ $output == "fail" ]]; then
+			print_message "Error" "the number you have entered is improper format ---> Installation failed"
+			exit 1
+		elif [[ $output == "pass" ]]; then
+			execute_asterisk_command "database put GLOBAL DIALIN ${newNum}"		
+			print_message "Notify" "${newNum} will now be used within extenstions.conf"
+		fi
 	fi
-
+	
 	newIP=$(dig +short ${hostName})
 	# WARNING -- the following line could pose a problem to 'dual-homed' servers
 	newLocalNet=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
