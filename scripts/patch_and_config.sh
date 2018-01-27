@@ -549,6 +549,25 @@ function init_ast_db {
 			print_message "Error" "could not add business hours end time to the Asterisk database"
 		fi 
 	fi
+	# check for business hours active flag
+        output=$(asterisk -rx "database get BUSINESS_HOURS ACTIVE" | cut -d ' ' -f 2)
+        if [[ $output == "entry" ]]; then
+                printf "Please provide the call center active flag (0=false, 1=true): "
+                read active_flag
+                #rez=$(error_check_time $end_time)
+                while [ $active_flag != "0" ] && [ $active_flag != "1" ]
+                do
+                        printf "You entered an improper active flag. Please try again: "
+                        read active_flag
+                        #rez=$(error_check_time $end_time)
+                done
+                rez=$(asterisk -rx "database put BUSINESS_HOURS EACTIVE ${active_flag}")
+                if [[ $rez == "Updated database successfully" ]]; then
+                        print_message "Success" "business hours active <${active_flag}>  has been added to the Asterisk database"
+                else
+                        print_message "Error" "could not add business hours active flag to the Asterisk database"
+                fi
+        fi
 }
 
 # execute the main function 
