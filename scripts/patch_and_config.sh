@@ -350,40 +350,43 @@ function install_configs {
 		let index=0
 
 		# modify the files with sed
-		mkdir temp
-		cp ../config/pjsip.conf ./temp
-		cp ../config/rtp.conf ./temp
-		cp ../config/res_stun_monitor.conf ./temp
-		cp ../config/http.conf ./temp
+		INPUT=config_instructions.csv
+		OLDIFS=$IFS
+		
+		if [ ! -f $INPUT ]; then
+			print_message "Error" "$INPUT file not found"
+			exit 1
+		else
+			# copy the configuration files into /etc/asterisk
+			configFiles=$(find ../ -name '*.conf')
+			for file in $configFiles
+			do
+				cp $file /etc/asterisk/
+				if [[ $? == 0 ]]; then
+					print_message "Notify" "copied ${file} ---> /etc/asterisk/"
+				else
+					print_message "Error" "failed to copy ${file} ---> /etc/asterisk/"
+					configStatus=false
+				fi
+			done
+			IFS=","
+			# modify each file from the configuration file
+			while read tag files value
+			do
+				# repeated for each line in the file
+				IFS="|"
+				for file in $files;
+				do
+					sed -i -e 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
+					exitCodes[$index]=$?
+					let index++
+					print_message "Notify" "modifed $tag in $file with $value"
+				done
+				IFS=","
+			done < $INPUT
+		fi
+		IFS=$OLDIFS
 
-		# change the public ip address
-		sed -i -e "s/<public_ip>/${newIP}/g" ./temp/pjsip.conf
-		exitCodes[$index]=$?
-		let index++
-	
-		# change the local ip address
-		sed -i -e "s/<local_ip>/${newLocalNet}/g" ./temp/pjsip.conf
-		exitCodes[$index]=$?
-		let index++
-		
-		# change stun server
-		stun="stun.task3acrdemo.com"
-		sed -i -e "s/<stun_server>/$stun/g" ./temp/rtp.conf ./temp/res_stun_monitor.conf
-		exitCodes[$index]=$?
-		let index++
-		
-		# change the cert file
-		certPath="\/etc\/asterisk\/keys\/star.pem"
-		sed -i -e "s/<crt_file>/$certPath/g" ./temp/pjsip.conf ./temp/http.conf
-		exitCodes[$index]=$?
-		let index++
-		
-		#change the cert key
-		keyPath="\/etc\/asterisk\/keys\/star.key"
-		sed -i -e "s/<crt_key>/$keyPath/g" ./temp/pjsip.conf ./temp/http.conf
-		exitCodes[$index]=$?
-		let index++
-		
 		# alert user if mods to pjsip.conf were successfull
 		problem=false
 		for code in ${exitCodes[@]}
@@ -402,58 +405,11 @@ function install_configs {
 			print_message "Notify" "modified configuration files successfully"
 		fi
 
-		# change the phone number associated with Asterisk for inbound calls from provider devices
-		#sed -i "s/[0-9]\{10\}/${newNum}/g" ./temp/extensions.conf 
-		
-		# alert user if mods to extensions.conf were successfull
-		#if [[ $? == 0 ]]; then
-		#	print_message "Notify" "modified extensions.conf successfully"
-		#else
-		#	print_message "Error" "there was a problem modifying extensions.conf"
-		#	configStatus=false
-		#fi
 	else
 		# handle the error
 		print_message "Error" "could not resolve IP address ---> Installation failed"
 		exit 1
 	fi
-
-	# replace the asterisk config files
-	cp ./temp/pjsip.conf /etc/asterisk
-	cp ./temp/rtp.conf /etc/asterisk
-	cp ./temp/res_stun_monitor.conf /etc/asterisk
-	cp ./temp/http.conf /etc/asterisk
-	#cp ./temp/extensions.conf /etc/asterisk/
-
-	if [[ $? == 0 ]]; then
-		print_message "Notify" "copied ./config/pjsip.conf ---> /etc/asterisk/"
-		print_message "Notify" "copied ./config/rtp.conf ---> /etc/asterisk/"
-		print_message "Notify" "copied ./config/res_stun_monitor.conf ---> /etc/asterisk/"
-		print_message "Notify" "copied ./config/http.conf ---> /etc/asterisk/"
-		echo "============================================================================="
-		#print_message "Notify" "copied ./configs/extensions.conf ---> /etc/asterisk/"
-	else
-		configStatus=false
-	fi
-
-	# replace the rest of the configuration files
-	configFiles=$(find ../ -name '*.conf' -and -not -name 'pjsip.conf'\
-					      -and -not -name 'rtp.conf'\
-					      -and -not -name 'res_stun_monitor.conf'\
-					      -and -not -name 'http.conf')
-	for file in $configFiles
-	do
-		cp $file /etc/asterisk/
-		if [[ $? == 0 ]]; then
-			print_message "Notify" "copied ${file} ---> /etc/asterisk/"
-		else
-			print_message "Error" "failed to copy ${file} ---> /etc/asterisk/"
-			configStatus=false
-		fi
-	done
-	
-	# clean up
-	rm -rf ./temp
 
 	# setup complete
 	if [[ $configStatus == "true" ]]; then
