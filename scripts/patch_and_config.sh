@@ -565,7 +565,7 @@ function init_ast_db {
 	# check for business hours active flag
         output=$(asterisk -rx "database get BUSINESS_HOURS ACTIVE" | cut -d ' ' -f 2)
         if [[ $output == "entry" ]]; then
-                printf "Please provide the call center active flag (0=false, 1=true, 2=closed): "
+                printf "Please provide the business hours active flag (0=not enforced, 1=enforced, 2=business closed): "
                 read active_flag
                 while [ $active_flag != "0" ] && [ $active_flag != "1" ] && [ $active_flag != "2" ] 
                 do
