@@ -219,6 +219,7 @@ sed -i -e "s/<crt_file>/$CRT_FILE/g" http.conf pjsip.conf
 sed -i -e "s/<crt_key>/$CRT_KEY/g" http.conf pjsip.conf
 sed -i -e "s/<ss_cert>/\/etc\/asterisk\/keys\/asterisk.pem/g" pjsip.conf
 sed -i -e "s/<ss_ca_crt>/\/etc\/asterisk\/keys\/ca.crt/g" pjsip.conf
+sed -i -e "s/<hostname>/$HOSTNAME/g" pjsip.conf
 
 echo ""
 echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"
