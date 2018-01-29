@@ -73,9 +73,9 @@ md5sum "pjproject-${pjVersion}.tar.bz2" > "pjproject-${pjVersion}.md5"
 astPath=$(find / -type d -name "asterisk-${astVersion}")
 cd $astPath
 
-# change the asterisk-15.1.2/third-party/pjproject/source/version.mak to 2.6.1
-#print_message "Notify" "setting custom pjproject build version to ${pjVersion}"
-#sed -i "s/2.6/${pjVersion}/g" "${astPath}/third-party/versions.mak"
+# change the asterisk-15.1.2/third-party/versions.mak to 2.6.1
+print_message "Notify" "setting custom pjproject build version to ${pjVersion}"
+sed -i "s/PJPROJECT_VERSION = 2.6.*/PJPROJECT_VERSION = ${pjVersion}/g" "${astPath}/third-party/versions.mak"
 
 # build
 ./configure --with-externals-cache="${instLoc}external-cache"
