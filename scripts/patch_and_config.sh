@@ -356,6 +356,11 @@ function install_configs {
 		cp ../config/res_stun_monitor.conf ./temp
 		cp ../config/http.conf ./temp
 
+		# change the hostname in pjsip.conf
+		sed -i -e "s/<hostname>/${hostName}/g" ./temp/pjsip.conf
+		exitCodes[$index]=$?
+		let index++
+		
 		# change the public ip address
 		sed -i -e "s/<public_ip>/${newIP}/g" ./temp/pjsip.conf
 		exitCodes[$index]=$?
