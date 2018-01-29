@@ -114,7 +114,7 @@ function error_check_args {
         done
 	
 	# initialize the asterisk database with business hours
-	init_ast_db
+	init_ast_db $phoneNum
 	
 	# run patchfunction 
 	if [[ $patch == "true" ]]; then
@@ -123,7 +123,7 @@ function error_check_args {
 
 	# run installation function
         if [[ $config == "true" ]]; then
-		install_configs $phoneNum
+		install_configs 
 	fi
 	
 	# handle any remaingin arg commands
@@ -330,26 +330,15 @@ function install_configs {
 		read hostName
 	fi
 	error_check_domain $hostName
-	# the new information
-	newNum=$1
-	if [[ $newNum  == "" ]]; then
-		# try to query asterisk db for call center phone number
-		newNum=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
-		print_message "Notify" "${newNum} will now be used within extenstions.conf"
-	else
-		# uodate DB with valid new number
-		output=$(error_check_num $newNum)
-		if [[ $output == "fail" ]]; then
-			print_message "Error" "the number you have entered is improper format ---> Installation failed"
-			exit 1
-		elif [[ $output == "pass" ]]; then
-			execute_asterisk_command "database put GLOBAL DIALIN ${newNum}"		
-			print_message "Notify" "${newNum} will now be used within extenstions.conf"
-		fi
-	fi
 	
+	# the new information
+	# this is not being used to mod files since extensions.conf pulls 
+	# directly from the DB but it is useful in alerting the user of the change
+	newNum=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
+	print_message "Notify" "${newNum} will now be used within extenstions.conf"
+
+	# WARNING -- the following line could pose a problem to 'dual-homed' servers	
 	newIP=$(dig +short ${hostName})
-	# WARNING -- the following line could pose a problem to 'dual-homed' servers
 	newLocalNet=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
 
 	if [[ ${newIP} != "" ]] && [[ ${newLocalNet} != "" ]]; then
@@ -410,7 +399,7 @@ function install_configs {
 			print_message "Error" "there was a problem modifying pjsip.conf"
 			configStatus=false
 		else
-			print_message "Notify" "modified pjsip.conf successfully"
+			print_message "Notify" "modified configuration files successfully"
 		fi
 
 		# change the phone number associated with Asterisk for inbound calls from provider devices
@@ -492,6 +481,21 @@ function execute_asterisk_command {
 }
 
 function init_ast_db {
+	# update DB with valid new number
+	if [[ ${1} != "" ]]; then
+		output=$(error_check_num $1)
+		if [[ $output == "fail" ]]; then
+			print_message "Error" "the number you have entered is improper format ---> Installation failed"
+			exit 1
+		elif [[ $output == "pass" ]]; then
+			rez=$(execute_asterisk_command "database put GLOBAL DIALIN ${1}")		
+			if [[ $rez == "Updated database successfully" ]]; then
+				print_message "Success" "Asterisk dialin number <${1}> has been added to the Asterisk database"
+			else
+				print_message "Error" "could not add dialin number to the Asterisk database"
+			fi
+		fi
+	fi
 	# check for the dialin number
 	output=$(asterisk -rx "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
 	if [[ $output == "entry" ]]; then
