@@ -340,10 +340,10 @@ function install_configs {
 	globalIP=$(dig +short ${hostName})
 	print_message "Notify" "this machine's global IP has been detected ---> ${globalIP}"
 	
-	# alert the user of the local address 
-	# WARNING -- the following line could pose a problem to 'dual-homed' servers
-	localIP=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
-	print_message "Notify" "this machine's local IP has been detected ---> ${localIP}"
+		# change the public ip address
+		sed -i -e "s/<public_ip>/${newIP}/g" ./temp/pjsip.conf
+		exitCodes[$index]=$?
+		let index++
 	
 	# status for user info
 	configStatus=true
