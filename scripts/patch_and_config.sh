@@ -118,7 +118,7 @@ function error_check_args {
 	
 	# run patchfunction 
 	if [[ $patch == "true" ]]; then
-		apply_patches $build $version	
+		apply_asterisk_patches $build $version	
 	fi
 
 	# run installation function
@@ -178,7 +178,7 @@ function error_check_domain {
 	fi
 	
 	# alert the user we are accepting the domain name
-	print_message "Notify" "$1 will now be used within pjsip.conf"
+	print_message "Notify" "this machine's domain name has been set to ---> $1"
 }
 
 function find_dir {
@@ -224,7 +224,7 @@ function find_dir {
         fi
 }
 
-function apply_patches {
+function apply_asterisk_patches {
         # check that we are in the proper directory 
 	currentPath=$(pwd)
 	currentDir=$(basename $currentPath)
@@ -301,8 +301,8 @@ function apply_patches {
                         print_message "Notify" "moving to ${asteriskPath}"
                         cd $asteriskPath
                         # make
-                        source /etc/environment
 			make && make install
+			make config
 			ldconfig
 			# move back into the AD repo
 			print_message "Notify" "moving back into ${AD}/scripts"
@@ -319,145 +319,77 @@ function install_configs {
 	AD=$(pwd)
 	current_dir=$(basename $AD)
         if ! [[ $current_dir == "scripts" ]]; then
-		print_message "Error" "you are nto executing this script from the proper scripts directoty ---> Installation failed."
+		print_message "Error" "you are not executing this script from the proper scripts directory ---> Installation Canceled."
 		exit 1
 	fi
+	
 	# check for the hostname
 	hostName=$(hostname)
 	if [[ $hostName == "" ]]; then 
 		# get the hostname from the user
-		printf "Please enter the domain name for this server:\t"
+		printf "Please enter the domain name for this server: "
 		read hostName
 	fi
 	error_check_domain $hostName
 	
-	# the new information
-	# this is not being used to mod files since extensions.conf pulls 
-	# directly from the DB but it is useful in alerting the user of the change
-	newNum=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
-	print_message "Notify" "${newNum} will now be used within extenstions.conf"
+	# alert user of the asterisk dialin number
+	dialin=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
+	print_message "Notify" "this machine's dialin number has been set to ---> ${dialin}"
 
-	# WARNING -- the following line could pose a problem to 'dual-homed' servers	
-	newIP=$(dig +short ${hostName})
-	newLocalNet=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
-
-	if [[ ${newIP} != "" ]] && [[ ${newLocalNet} != "" ]]; then
-		# status for user info
-		configStatus=true
+	# alert user of th global address
+	globalIP=$(dig +short ${hostName})
+	print_message "Notify" "this machine's global IP has been detected ---> ${globalIP}"
 	
-		# create an array to hold exit codes
-		declare -a exitCodes
-		let index=0
-
-		# modify the files with sed
-		mkdir temp
-		cp ../config/pjsip.conf ./temp
-		cp ../config/rtp.conf ./temp
-		cp ../config/res_stun_monitor.conf ./temp
-		cp ../config/http.conf ./temp
-
-		# change the hostname in pjsip.conf
-		sed -i -e "s/<hostname>/${hostName}/g" ./temp/pjsip.conf
-		exitCodes[$index]=$?
-		let index++
-		
 		# change the public ip address
 		sed -i -e "s/<public_ip>/${newIP}/g" ./temp/pjsip.conf
 		exitCodes[$index]=$?
 		let index++
 	
-		# change the local ip address
-		sed -i -e "s/<local_ip>/${newLocalNet}/g" ./temp/pjsip.conf
-		exitCodes[$index]=$?
-		let index++
-		
-		# change stun server
-		stun="stun.task3acrdemo.com"
-		sed -i -e "s/<stun_server>/$stun/g" ./temp/rtp.conf ./temp/res_stun_monitor.conf
-		exitCodes[$index]=$?
-		let index++
-		
-		# change the cert file
-		certPath="\/etc\/asterisk\/keys\/star.pem"
-		sed -i -e "s/<crt_file>/$certPath/g" ./temp/pjsip.conf ./temp/http.conf
-		exitCodes[$index]=$?
-		let index++
-		
-		#change the cert key
-		keyPath="\/etc\/asterisk\/keys\/star.key"
-		sed -i -e "s/<crt_key>/$keyPath/g" ./temp/pjsip.conf ./temp/http.conf
-		exitCodes[$index]=$?
-		let index++
-		
-		# alert user if mods to pjsip.conf were successfull
-		problem=false
-		for code in ${exitCodes[@]}
+	# status for user info
+	configStatus=true
+
+	# modify the files with sed
+	INPUT=config_instructions.csv
+	OLDIFS=$IFS
+	
+	if [ ! -f $INPUT ]; then
+		print_message "Error" "$INPUT file not found"
+		exit 1
+	else
+		# copy the configuration files into /etc/asterisk
+		configFiles=$(find ../config -name '*.*')
+		echo "============================================================"
+		for file in $configFiles
 		do
-			if [[ $code == "1" ]]; then
-				problem=true
+			cp $file /etc/asterisk/
+			if [[ $? == 0 ]]; then
+				print_message "Notify" "copied ${file} ---> /etc/asterisk/"
+			else
+				print_message "Error" "failed to copy ${file} ---> /etc/asterisk/"
 				configStatus=false
-				break
 			fi
 		done
-
-		if [[ $problem == "true" ]]; then
-			print_message "Error" "there was a problem modifying pjsip.conf"
-			configStatus=false
-		else
-			print_message "Notify" "modified configuration files successfully"
-		fi
-
-		# change the phone number associated with Asterisk for inbound calls from provider devices
-		#sed -i "s/[0-9]\{10\}/${newNum}/g" ./temp/extensions.conf 
-		
-		# alert user if mods to extensions.conf were successfull
-		#if [[ $? == 0 ]]; then
-		#	print_message "Notify" "modified extensions.conf successfully"
-		#else
-		#	print_message "Error" "there was a problem modifying extensions.conf"
-		#	configStatus=false
-		#fi
-	else
-		# handle the error
-		print_message "Error" "could not resolve IP address ---> Installation failed"
-		exit 1
+		IFS=","
+		# modify each file from the configuration file
+		echo "============================================================"
+		while read tag files value
+		do
+			# repeated for each line in the file
+			IFS="|"
+			for file in $files;
+			do
+				sed -i 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
+				if [[ $? == "0" ]]; then
+					print_message "Notify" "modifed $tag in $file with $value"
+				else
+					print_message "Error" "could NOT modify $tag in $file with $value"
+					configStatus=false
+				fi
+			done
+			IFS=","
+		done < $INPUT
 	fi
-
-	# replace the asterisk config files
-	cp ./temp/pjsip.conf /etc/asterisk
-	cp ./temp/rtp.conf /etc/asterisk
-	cp ./temp/res_stun_monitor.conf /etc/asterisk
-	cp ./temp/http.conf /etc/asterisk
-	#cp ./temp/extensions.conf /etc/asterisk/
-
-	if [[ $? == 0 ]]; then
-		print_message "Notify" "copied ./config/pjsip.conf ---> /etc/asterisk/"
-		print_message "Notify" "copied ./config/rtp.conf ---> /etc/asterisk/"
-		print_message "Notify" "copied ./config/res_stun_monitor.conf ---> /etc/asterisk/"
-		print_message "Notify" "copied ./config/http.conf ---> /etc/asterisk/"
-		echo "============================================================================="
-		#print_message "Notify" "copied ./configs/extensions.conf ---> /etc/asterisk/"
-	else
-		configStatus=false
-	fi
-
-	# replace the rest of the configuration files
-	configFiles=$(find ../ -name '*.conf' -and -not -name 'pjsip.conf'\
-					      -and -not -name 'rtp.conf'\
-					      -and -not -name 'res_stun_monitor.conf'\
-					      -and -not -name 'http.conf')
-	for file in $configFiles
-	do
-		cp $file /etc/asterisk/
-		if [[ $? == 0 ]]; then
-			print_message "Notify" "copied ${file} ---> /etc/asterisk/"
-		else
-			configStatus=false
-		fi
-	done
-	
-	# clean up
-	rm -rf ./temp
+	IFS=$OLDIFS
 
 	# setup complete
 	if [[ $configStatus == "true" ]]; then
