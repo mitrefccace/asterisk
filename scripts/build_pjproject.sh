@@ -5,7 +5,7 @@ startPath=$(pwd)
 currDir=$(dirname $startPath)
 instLoc="/usr/src/"
 astVersion="15.1.2"
-pjVersion="2.6.1"
+pjVersion="2.6-custom"
 
 function print_message {
         # first argument is the type of message
@@ -29,7 +29,6 @@ function print_message {
 }
 
 # get the third party asterisk tarball for pjproject
-source /etc/environment
 print_message "Notify" "pulling down the pjproject source code from github"
 git clone https://github.com/asterisk/third-party.git
 sleep 2
@@ -76,7 +75,7 @@ cd $astPath
 
 # change the asterisk-15.1.2/third-party/versions.mak to 2.6.1
 print_message "Notify" "setting custom pjproject build version to ${pjVersion}"
-sed -i "s/PJPROJECT_VERSION = 2.6.*/PJPROJECT_VERSION = ${pjVersion}/g" "${astPath}/third-party/versions.mak"
+sed -i "s/PJPROJECT_VERSION = *.*/PJPROJECT_VERSION = ${pjVersion}/g" "${astPath}/third-party/versions.mak"
 
 # build
 ./configure --with-externals-cache="${instLoc}external-cache"
@@ -84,14 +83,14 @@ make
 make install
 if [[ $? == "0" ]];then
 	print_message "Success" "Asterisk ${astVersion} built successfully with custom pjproject version ${pjVersion}"
+	make config
+	ldconfig
+	# clean up
 	cd $startPath
 	rm -rf ./third-party
 else
 	print_message "Error" "failed to install Asterisk-${astVersion} with pjproject ${pjVersion}"
 fi
-
-# update libraries
-ldconfig
 
 # restart the Asterisk instance
 service asterisk restart

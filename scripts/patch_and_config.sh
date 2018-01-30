@@ -301,8 +301,8 @@ function apply_asterisk_patches {
                         print_message "Notify" "moving to ${asteriskPath}"
                         cd $asteriskPath
                         # make
-                        source /etc/environment
 			make && make install
+			make config
 			ldconfig
 			# move back into the AD repo
 			print_message "Notify" "moving back into ${AD}/scripts"
