@@ -2,6 +2,7 @@
 
 # note our current dir location
 startPath=$(pwd)
+currDir=$(dirname $startPath)
 instLoc="/usr/src/"
 astVersion="15.1.2"
 pjVersion="2.6.1"
@@ -48,11 +49,11 @@ mv "${instLoc}custom-build/pjproject-2.6" "${instLoc}custom-build/pjproject-${pj
  
 # add the included header file in /usr/src/pjproject-2.6.1/pjsip/include/pjsip-ua/
 print_message "Notify" "adding sip_config.h to pjproject"
-cp ../include/pjproject/sip_config.h "${instLoc}custom-build/pjproject-${pjVersion}/pjsip/include/pjsip-ua/"
+cp "${currDir}/include/pjproject/sip_config.h" "${instLoc}custom-build/pjproject-${pjVersion}/pjsip/include/pjsip-ua/"
 
 # apply the patch to the source code
 print_message "Notify" "applying patch to sip_inv.c"
-patch "${instLoc}custom-build/pjproject-${pjVersion}/pjsip/src/pjsip-ua/sip_inv.c" ../patches/pjproject/2.6/sip_inv.c.patch
+patch "${instLoc}custom-build/pjproject-${pjVersion}/pjsip/src/pjsip-ua/sip_inv.c" "${currDir}/patches/pjproject/2.6/sip_inv.c.patch"
 
 # creat the new cache dir
 if [ ! -d "${instLoc}external-cache" ]; then
@@ -89,7 +90,11 @@ else
 	print_message "Error" "failed to install Asterisk-${astVersion} with pjproject ${pjVersion}"
 fi
 
+# update libraries
 ldconfig
+
+# restart the Asterisk instance
+service asterisk restart
 
 # EOF
 
