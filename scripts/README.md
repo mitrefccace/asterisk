@@ -66,39 +66,32 @@ Note the format of the CA cert and key, namely using '\/' to represent directory
 1. Clone this repo to the destination. 
 2. Move into __asterisk__.
 3. Execute `sudo su` 
+4. Modify config_instructions.csv 
 4. Execute script  
 
+## Asterisk Database Initialization 
+* Everytime the PAC script is run, it will check the Asterisk database for the following 
+values : (GLOBAL DIALIN, BUSINESS_HOURS START, BUSINESS_HOURS END, BUSINESS_HOURS ACTIVE). 
+* If any of these values are missing in the DB, the user will be prompted for information.
+* If the entered value is not accepted, then the user will be re-prompted. 
+* If the dialin flag is specified, then the DB value for this field will be modified. 
 ## Configuration files
-##### Variables
-* The __external_media_address__ parameter within __pjsip.conf__ requires modification. 
-This script utilizes the machine's hostname to determine the external IP address. If
-this value is null, it will query the user to input the proper domain name.
-* The __local_net__ parameter will be set using the __ifconfig__ tool. 
-* The phone number for the server must be modified within __extensions.conf__. 
-This can be supplied with the __--dialin__ flag. Otherwise, it quereis the Asterisk
-databse for the dialin number. If this value is null or has not been configured, then the 
-user will be asked to enter the phone number before proceeding. 
-* Additionally, everytime this program is run, it will check that the Asterisk DB contains 
-entries for the dialin number and both the start and end times for the call center. If any 
-of the values are null, the user will be queried. 
-
+##### config_instructions.csv
+* This is a comma separated value file which contains file modification instructions
+for some of the tracked configuration files. 
+* The line format is <place_holder>,file_1|file_2|...|file_n,value.
+* Each file will be modifed so the place holder within it is replaced with the included value.
 ##### Error checking
 * The domain name is checked to make sure the __dig__ command can resolve the address. 
 If not, it returns an error. 
 * The phone number is validated by checking that it is composed of only numbers [0-9] 
 and contains only 10 total digits. If not, it returns an error.
 * The start and end times are evaluated to make sure they are in the proper ##:## format.
-
+If not, it will loop untill the user enters a proper value for the Asterisk DB.
 ##### File modifications
 * These are made by executing sed commands to perform a search and replace on the files.
 * The modifications are made within a temporary directory so that the original files are 
 not altered. 
-
-##### Clean up
-* The modified files are first copied into __/etc/asterisk/__.
-* Then the temporary directory is removed.
-* If the __--restart__ option is selected, Asterisk will be restarted. 
-* If the __--cli__ option is selected, the Command Line Interface for Asterisk will launch. 
 
 ## Patch files
 
@@ -120,8 +113,9 @@ the project after applying the patches.
 ## Example usage
 
 ```sh
-$ ./patch_and_config.sh --version 15.1.2 --patch --build --config --restart --cli
+$ ./patch_and_config.sh --version 15.1.2 --patch --config --dialin 7032935641 --restart --cli
 
 ```
 * The example above will look for the asterisk-15.1.2 repository so that it can apply the patch files then rebuild
-the source. Afterwards, it will handle the replacement of the configuration files, restart, and launch the Asterisk CLI.
+the source. Afterwards, it will handle the replacement of the configuration files, set the dialin value in the Asterisk 
+database to 7032935641, restart, and launch the Asterisk CLI.
