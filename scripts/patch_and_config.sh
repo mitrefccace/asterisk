@@ -178,7 +178,7 @@ function error_check_domain {
 	fi
 	
 	# alert the user we are accepting the domain name
-	print_message "Notify" "$1 will now be used within pjsip.conf"
+	print_message "Notify" "this machine's domain name has been set to ---> $1"
 }
 
 function find_dir {
@@ -319,97 +319,77 @@ function install_configs {
 	AD=$(pwd)
 	current_dir=$(basename $AD)
         if ! [[ $current_dir == "scripts" ]]; then
-		print_message "Error" "you are nto executing this script from the proper scripts directoty ---> Installation failed."
+		print_message "Error" "you are not executing this script from the proper scripts directory ---> Installation Canceled."
 		exit 1
 	fi
+	
 	# check for the hostname
 	hostName=$(hostname)
 	if [[ $hostName == "" ]]; then 
 		# get the hostname from the user
-		printf "Please enter the domain name for this server:\t"
+		printf "Please enter the domain name for this server: "
 		read hostName
 	fi
 	error_check_domain $hostName
 	
-	# the new information
-	# this is not being used to mod files since extensions.conf pulls 
-	# directly from the DB but it is useful in alerting the user of the change
-	newNum=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
-	print_message "Notify" "${newNum} will now be used within extenstions.conf"
+	# alert user of the asterisk dialin number
+	dialin=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
+	print_message "Notify" "this machine's dialin number has been set to ---> ${dialin}"
 
-	# WARNING -- the following line could pose a problem to 'dual-homed' servers	
-	newIP=$(dig +short ${hostName})
-	newLocalNet=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
-
-	if [[ ${newIP} != "" ]] && [[ ${newLocalNet} != "" ]]; then
-		# status for user info
-		configStatus=true
+	# alert user of th global address
+	globalIP=$(dig +short ${hostName})
+	print_message "Notify" "this machine's global IP has been detected ---> ${globalIP}"
 	
-		# create an array to hold exit codes
-		declare -a exitCodes
-		let index=0
+	# alert the user of the local address 
+	# WARNING -- the following line could pose a problem to 'dual-homed' servers
+	localIP=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
+	print_message "Notify" "this machine's local IP has been detected ---> ${localIP}"
+	
+	# status for user info
+	configStatus=true
 
-		# modify the files with sed
-		INPUT=config_instructions.csv
-		OLDIFS=$IFS
-		
-		if [ ! -f $INPUT ]; then
-			print_message "Error" "$INPUT file not found"
-			exit 1
-		else
-			# copy the configuration files into /etc/asterisk
-			configFiles=$(find ../ -name '*.conf')
-			for file in $configFiles
+	# modify the files with sed
+	INPUT=config_instructions.csv
+	OLDIFS=$IFS
+	
+	if [ ! -f $INPUT ]; then
+		print_message "Error" "$INPUT file not found"
+		exit 1
+	else
+		# copy the configuration files into /etc/asterisk
+		configFiles=$(find ../config -name '*.*')
+		echo "============================================================"
+		for file in $configFiles
+		do
+			cp $file /etc/asterisk/
+			if [[ $? == 0 ]]; then
+				print_message "Notify" "copied ${file} ---> /etc/asterisk/"
+			else
+				print_message "Error" "failed to copy ${file} ---> /etc/asterisk/"
+				configStatus=false
+			fi
+		done
+		IFS=","
+		# modify each file from the configuration file
+		echo "============================================================"
+		while read tag files value
+		do
+			# repeated for each line in the file
+			IFS="|"
+			for file in $files;
 			do
-				cp $file /etc/asterisk/
-				if [[ $? == 0 ]]; then
-					print_message "Notify" "copied ${file} ---> /etc/asterisk/"
+				sed -i 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
+				if [[ $? == "0" ]]; then
+					print_message "Notify" "modifed $tag in $file with $value"
 				else
-					print_message "Error" "failed to copy ${file} ---> /etc/asterisk/"
+					print_message "Error" "could NOT modify $tag in $file with $value"
 					configStatus=false
 				fi
 			done
 			IFS=","
-			# modify each file from the configuration file
-			while read tag files value
-			do
-				# repeated for each line in the file
-				IFS="|"
-				for file in $files;
-				do
-					sed -i -e 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
-					exitCodes[$index]=$?
-					let index++
-					print_message "Notify" "modifed $tag in $file with $value"
-				done
-				IFS=","
-			done < $INPUT
-		fi
-		IFS=$OLDIFS
-
-		# alert user if mods to pjsip.conf were successfull
-		problem=false
-		for code in ${exitCodes[@]}
-		do
-			if [[ $code == "1" ]]; then
-				problem=true
-				configStatus=false
-				break
-			fi
-		done
-
-		if [[ $problem == "true" ]]; then
-			print_message "Error" "there was a problem modifying pjsip.conf"
-			configStatus=false
-		else
-			print_message "Notify" "modified configuration files successfully"
-		fi
-
-	else
-		# handle the error
-		print_message "Error" "could not resolve IP address ---> Installation failed"
-		exit 1
+		done < $INPUT
 	fi
+	IFS=$OLDIFS
 
 	# setup complete
 	if [[ $configStatus == "true" ]]; then
