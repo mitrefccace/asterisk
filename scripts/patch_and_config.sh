@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------
 # Author   : Connor McCann
 # Project  : Ace Direct Asterisk Configuration 
-# Date     : 18 Jan 2018
+# Date     : 31 Jan 2018
 # Purpose  : To automate patches and the installation of Asterisk configuration 
 #            files on various Ace Direct servers.
 #----------------------------------------------------------------------------
@@ -21,7 +21,8 @@ function show_instructions {
 		echo "+            --help     : Optional : Displays these program instructions                          +"
 		echo "+            --patch    : Required : Applies patch files to source code                           +"
 		echo "+            --config   : Required : Copies configuration files into /etc/asterisk/               +"
-		echo "+            --version  : Required : Specifies which version of Asterisk to look for              +"
+		echo "+            --db       : Required : Sets Asterisk database values                                +"
+		echo "+            --version  : Optional : Specifies which version of Asterisk to look for              +"
 		echo "+            --no-build : Optional : Opts not to build the source code                            +"
 		echo "+            --restart  : Optional : Restarts Asterisk                                            +"
 		echo "+            --cli      : Optional : Launches Asterisk CLI upon completion                        +"
@@ -61,6 +62,7 @@ function error_check_args {
         # parse all of the input arguments
 	patch=false
 	config=false
+	db=false
 	build=true
 	restartArg=false
         cliArg=false
@@ -92,6 +94,9 @@ function error_check_args {
 			--config)
 				config=true
 				;;
+			--db)
+				db=true
+				;;
 			--version)
 				nextIsVersion=true
 				;;
@@ -114,21 +119,19 @@ function error_check_args {
         done
 	
 	# initialize the asterisk database with business hours
-	init_ast_db $phoneNum
-	
+	if [ $db == "true" ] || [ $phoneNum != "" ]; then
+		init_ast_db $phoneNum
+	fi
 	# run patchfunction 
 	if [[ $patch == "true" ]]; then
 		apply_asterisk_patches $build $version	
 	fi
-
 	# run installation function
         if [[ $config == "true" ]]; then
 		install_configs 
 	fi
-	
 	# handle any remaingin arg commands
 	execute_args $restartArg $cliArg 
-
 }
 
 function error_check_time {
