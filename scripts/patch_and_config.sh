@@ -118,11 +118,14 @@ function error_check_args {
                 esac
         done
 	
+	# check asterisk service status
+	check_ast_status
+
 	# initialize the asterisk database with business hours
-	if [ $db == "true" ] || [ $phoneNum != "" ]; then
+	if [[ $db == "true" ]] || [[ $phoneNum != "" ]]; then
 		init_ast_db $phoneNum
 	fi
-	# run patchfunction 
+	# run patch function 
 	if [[ $patch == "true" ]]; then
 		apply_asterisk_patches $build $version	
 	fi
@@ -337,8 +340,14 @@ function install_configs {
 	
 	# alert user of the asterisk dialin number
 	dialin=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
-	print_message "Notify" "this machine's dialin number has been set to ---> ${dialin}"
-
+	# Error check
+	rez=$(error_check_num $dialin)	
+	if [ $rez == "pass" ]; then
+		print_message "Notify" "this machine's dialin number has been set to ---> ${dialin}"
+	else
+		print_message "Error" "no dialin number present for Asterisk. Please run script again with --db ---> Installation canceled"
+		exit 1	
+	fi
 	# alert user of th global address
 	globalIP=$(dig +short ${hostName})
 	print_message "Notify" "this machine's global IP has been detected ---> ${globalIP}"
@@ -365,7 +374,7 @@ function install_configs {
 		for file in $configFiles
 		do
 			cp $file /etc/asterisk/
-			if [[ $? == 0 ]]; then
+			if [[ $? == "0" ]]; then
 				print_message "Notify" "copied ${file} ---> /etc/asterisk/"
 			else
 				print_message "Error" "failed to copy ${file} ---> /etc/asterisk/"
@@ -437,7 +446,7 @@ function init_ast_db {
 		fi
 	fi
 	# check for the dialin number
-	output=$(asterisk -rx "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
+	output=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
 	if [[ $output == "entry" ]]; then
 		printf "Please provide the call center dialin number: "
 		read dialin
@@ -460,7 +469,7 @@ function init_ast_db {
 	fi
 	
 	# check for business hours start time
-	output=$(asterisk -rx "database get BUSINESS_HOURS START" | cut -d ' ' -f 2)
+	output=$(execute_asterisk_command "database get BUSINESS_HOURS START" | cut -d ' ' -f 2)
 	if [[ $output == "entry" ]]; then
 		printf "Please provide the call center start time: "
 		read start_time
@@ -479,7 +488,7 @@ function init_ast_db {
 		fi 
 	fi 
 	# check for business hours end time
-	output=$(asterisk -rx "database get BUSINESS_HOURS END" | cut -d ' ' -f 2)
+	output=$(execute_asterisk_command "database get BUSINESS_HOURS END" | cut -d ' ' -f 2)
 	if [[ $output == "entry" ]]; then
 		printf "Please provide the call center end time: "
 		read end_time
@@ -498,7 +507,7 @@ function init_ast_db {
 		fi 
 	fi
 	# check for business hours active flag
-        output=$(asterisk -rx "database get BUSINESS_HOURS ACTIVE" | cut -d ' ' -f 2)
+        output=$(execute_asterisk_command "database get BUSINESS_HOURS ACTIVE" | cut -d ' ' -f 2)
         if [[ $output == "entry" ]]; then
                 printf "Please provide the business hours active flag (0=not enforced, 1=enforced, 2=business closed): "
                 read active_flag
@@ -514,6 +523,14 @@ function init_ast_db {
                         print_message "Error" "could not add business hours active flag to the Asterisk database"
                 fi
         fi
+}
+
+function check_ast_status {
+	rez=$(service asterisk status | grep Active | cut -d ':' -f2 | cut -d ' ' -f2)
+	if [[ $rez != "active" ]]; then
+		print_message "Error" "Asterisk service is unreahcable ---> Installation canceled"
+		exit 1
+	fi
 }
 
 # execute the main function 
