@@ -21,8 +21,6 @@ The Asterisk for ACE Direct configuration assumes the following:
 * A "dial-in" number which has been registered in iTRS and/or a SIP trunk provider (such as Twilio) (optional)
 * An SSL cert file, acquired from a trusted certificate authority, for the domain of your server. This is necessary for WebRTC functionality as major browsers will drop connections to the Asterisk server if it's cert is not trusted.
 
-- A note on the SSL certs: a CA-signed cert is not required to run ACE Direct; however, using the Asterisk self-signed certificate will require users to manually import the self-signed cert's ca.crt file into their browser. Otherwise, WebRTC will fail.
-
 
 ## Configuration
 
