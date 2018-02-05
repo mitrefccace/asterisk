@@ -28,15 +28,6 @@ INPUT=.config
 #Hostname command suggestion
 HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
 
-print_args()
-{
-
-echo "Required params: --public-ip, --local-ip" >&2
-echo "Aborting" >&2
-exit 1
-
-} >&2
-
 print_message() {
         # first argument is the type of message
         # (Error, Notify, Warning, Success)
@@ -72,51 +63,6 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-# read the options
-TEMP=`getopt -o a:: -l public-ip:,local-ip:,dialin:,stun-server:,crt-file:,crt-key: -n '$0' -- "$@"`
-eval set -- "$TEMP"
-
-#evaluate options
-while true
-do
-        case "$1" in
-        --public-ip)
-                case $2 in
-                        #"") print_args ;;
-                        *) PUBLIC_IP=$2; shift 2 ;;
-                esac ;;
-        --local-ip)
-                case "$2" in
-                        #"") print_args ;;
-                        *) LOCAL_IP=$2; shift 2 ;;
-                esac ;;
-        --dialin)
-                case "$2" in
-                        "") echo "WARNING: no dial-in number specified. Using 1234567890 as a placeholder to prevent failed config parsing."
-                        DIALIN='1234567890'; shift 2;;
-                        *) DIALIN=$2; shift 2 ;;
-                esac ;;
-        --stun-server)
-                case "$2" in
-                        "") echo "WARNING: no STUN server specified. Using Google STUN address at $GOOGLE."
-                        STUN_SERVER=$GOOGLE; shift 2;;
-                        *) STUN_SERVER=$2; shift 2 ;;
-                esac ;;
-        --crt-file)
-                case "$2" in
-                        "") echo "WARNING: no SSL/TLS certificate specified. Using to-be-generated self-signed Asterisk certificate."
-                        CRT_FILE="//etc//asterisk//keys//asterisk.crt"; shift 2;;
-                        *) CRT_FILE=$2; shift 2 ;;
-                esac ;;
-        --crt-key)
-                case "$2" in
-                        "") CRT_KEY="//etc//asterisk//keys//asterisk.key"; shift 2;;
-                        *) CRT_KEY=$2; shift 2 ;;
-                esac ;;
-        --) shift ; break ;;
-        *) echo "Error parsing args"; print_args;;
-    esac
-done
 
 # Retreive the public IP from the .config. If it wasn't loaded, fail the script.
 IFS=","
@@ -136,32 +82,6 @@ echo "============================================================"
 		fi
 	
         done < $INPUT
-
-# set defaults for non-required options
-
-if [ -z $STUN_SERVER ]
-then
-    echo "WARNING: no STUN server specified. Using Google STUN address at $GOOGLE."
-    STUN_SERVER=$GOOGLE
-fi
-
-if [ -z $DIALIN ]
-then
-    echo "WARNING: no dial-in number specified. Using 1234567890 as a placeholder to prevent failed config parsing."
-    DIALIN='1234567890'
-fi
-
-if [ -z $CRT_FILE ]
-then
-    echo "WARNING: no SSL/TLS certificate specified. Using to-be-generated self-signed Asterisk certificate."
-    CRT_FILE="\/etc\/asterisk\/keys\/asterisk.crt"
-fi
-
-if [ -z $CRT_KEY ]
-then
-    CRT_KEY="\/etc\/asterisk\/keys\/asterisk.key"
-fi
-
 
 #check for IPv6 and SElinux
 
@@ -255,23 +175,12 @@ chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 cd $startPath
 ./patch_and_config.sh --config --db --restart
 
-#cd /etc/asterisk
-
-#sed -i -e "s/<public_ip>/$PUBLIC_IP/g" pjsip.conf
-#sed -i -e "s/<local_ip>/$LOCAL_IP/g" pjsip.conf
-#sed -i -e "s/<dialin>/$DIALIN/g" extensions.conf pjsip.conf
-#sed -i -e "s/<stun_server>/$STUN_SERVER/g" rtp.conf res_stun_monitor.conf
-#sed -i -e "s/<crt_file>/$CRT_FILE/g" http.conf pjsip.conf
-#sed -i -e "s/<crt_key>/$CRT_KEY/g" http.conf pjsip.conf
-#sed -i -e "s/<ss_cert>/\/etc\/asterisk\/keys\/asterisk.pem/g" pjsip.conf
-#sed -i -e "s/<ss_ca_crt>/\/etc\/asterisk\/keys\/ca.crt/g" pjsip.conf
-#sed -i -e "s/<hostname>/$HOSTNAME/g" pjsip.conf
-
 echo ""
 echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"
 echo "manager password in manager.conf should be updated before starting Asterisk."
-echo "Otherwise, the defaults will be used. View the conf files in /etc/asterisk"
-echo "for more info."
+echo "Otherwise, the defaults will be used. Once the passwords have been updated,"
+echo "Run 'service asterisk restart' to apply the changes."
+echo "View the conf files in /etc/asterisk for more info."
 echo ""
 echo ""
 echo "     _    ____ _____   ____ ___ ____  _____ ____ _____ "
@@ -280,4 +189,4 @@ echo "   / _ \| |   |  _|   | | | | || |_) |  _|| |     | |  "
 echo "  / ___ \ |___| |___  | |_| | ||  _ <| |__| |___  | |  "
 echo " /_/   \_\____|_____| |____/___|_| \_\_____\____| |_|  "
 echo ""
-echo "Installation is complete. When ready, run 'service asterisk start' as root to start Asterisk."
+echo "Installation is complete. When ready, run 'asterisk -rvvvvvvcg' to start the Asterisk console."
