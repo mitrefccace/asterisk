@@ -65,14 +65,12 @@ echo "Please enter a valid IP address into .config and try again."
 exit 1
 }
 
-#check for empty params
-#if [ $# -eq 0 ]
-#  then
-#    echo "No arguments supplied"
-#    print_args
-#    exit 1
-#fi
-
+# fail if the script is not run as root
+# Source: http://www.cyberciti.biz/tips/shell-root-user-check-script.html
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
 
 # read the options
 TEMP=`getopt -o a:: -l public-ip:,local-ip:,dialin:,stun-server:,crt-file:,crt-key: -n '$0' -- "$@"`
@@ -130,6 +128,7 @@ echo "============================================================"
 		if [ "$tag" == "<public_ip>" ]; then
 			echo "$value" > $TMP_FILE
 			PUBLIC_IP=$(grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' $TMP_FILE 2>/dev/null) || :
+			rm -f $TMP_FILE
 			if [ "$PUBLIC_IP" == "" ]; then
         			print_message "Error" "a proper public IP address was not supplied in .config"
         			exit 1
@@ -137,10 +136,6 @@ echo "============================================================"
 		fi
 	
         done < $INPUT
-
-# delete this when you're done testing the above
-echo "Public IP: $PUBLIC_IP"
-exit 0
 
 # set defaults for non-required options
 
@@ -235,11 +230,6 @@ cd $startPath
 ./patch_and_config.sh --patch --no-build
 ./build_pjproject.sh
 
-#./configure --with-pjproject-bundled
-#make
-#make install
-#make config
-
 #run ldconfig so that Asterisk finds PJPROJECT packages
 echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
 /sbin/ldconfig
@@ -251,9 +241,6 @@ sleep 2
 /usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 
 # pull down confi/media files and add to /etc/asterisk and /var/lib/asterisk/sounds, respectively
-#cd ~
-#git clone $GIT_URL
-#cd /home/centos/asterisk-codev
 repo=$(dirname $startPath)
 cd $repo
 yes | cp -rf config/* /etc/asterisk
