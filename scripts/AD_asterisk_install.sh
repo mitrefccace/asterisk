@@ -179,7 +179,7 @@ sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 
 cd $startPath
 # Apply custom Asterisk patches, then apply custom PJPROJECT patch and install PJ and Asterisk
-./patch_and_config.sh --patch
+./patch_and_config.sh --patch --no-build
 ./build_pjproject.sh
 
 #./configure --with-pjproject-bundled
