@@ -5,22 +5,14 @@ set -e
 
 startPath=$(pwd)
 
-#set variable names
+#we need this to generate the self-signed Asterisk certs
 PUBLIC_IP=''
-LOCAL_IP=''
-DIALIN=''
-STUN_SERVER=''
-CRT_FILE=''
-CRT_KEY=''
 
 #default STUN will be set to Google
 GOOGLE='stun4.l.google.com:19302'
 
 #Asterisk version
 AST_VERSION=15.1.2
-
-#Git URL
-GIT_URL=https://github.com/mitrefccace/asterisk.git
 
 # Config file
 INPUT=.config
