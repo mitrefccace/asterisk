@@ -22,6 +22,9 @@ AST_VERSION=15.1.2
 #Git URL
 GIT_URL=https://github.com/mitrefccace/asterisk.git
 
+# Config file
+INPUT=.config
+
 #Hostname command suggestion
 HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
 
@@ -33,6 +36,34 @@ echo "Aborting" >&2
 exit 1
 
 } >&2
+
+print_message() {
+        # first argument is the type of message
+        # (Error, Notify, Warning, Success)
+        colorCode="sgr0"
+        case $1 in
+                Error)
+                        colorCode=1
+                        ;;
+                Notify)
+                        colorCode=3
+                        ;;
+                Success)
+                        colorCode=2
+                        ;;
+        esac
+
+        # second argument is the message string
+        tput setaf $colorCode; printf "${1} -- "
+        tput sgr0;             printf "${2}\n"
+}
+
+error_public_ip()
+{
+echo "ERROR: a proper public IP address was not found in .config"
+echo "Please enter a valid IP address into .config and try again."
+exit 1
+}
 
 #check for empty params
 #if [ $# -eq 0 ]
@@ -88,6 +119,28 @@ do
         *) echo "Error parsing args"; print_args;;
     esac
 done
+
+# Retreive the public IP from the .config. If it wasn't loaded, fail the script.
+IFS=","
+TMP_FILE=/tmp/public_ip
+# modify each file from the configuration file
+echo "============================================================"
+	while read tag files value
+        do
+		if [ "$tag" == "<public_ip>" ]; then
+			echo "$value" > $TMP_FILE
+			PUBLIC_IP=$(grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' $TMP_FILE 2>/dev/null) || :
+			if [ "$PUBLIC_IP" == "" ]; then
+        			print_message "Error" "a proper public IP address was not supplied in .config"
+        			exit 1
+			fi
+		fi
+	
+        done < $INPUT
+
+# delete this when you're done testing the above
+echo "Public IP: $PUBLIC_IP"
+exit 0
 
 # set defaults for non-required options
 
@@ -195,7 +248,6 @@ echo "Generating the Asterisk self-signed certificates. You will be prompted to 
 sleep 2
 
 #generate TIS certificates
-PUBLIC_IP=$(nslookup $HOSTNAME | grep Address | tail -1 | awk '{print $2}')
 /usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 
 # pull down confi/media files and add to /etc/asterisk and /var/lib/asterisk/sounds, respectively
