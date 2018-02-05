@@ -1,6 +1,0 @@
-<local_ip>,pjsip.conf,172.21.1.118,
-<public_ip>,pjsip.conf,34.196.112.243,
-<stun_server>,rtp.conf|res_stun_monitor.conf,stun.task3acrdemo.com,
-<crt_file>,pjsip.conf|http.conf,\/etc\/asterisk\/keys\/star.pem,
-<crt_key>,pjsip.conf|http.conf,\/etc\/asterisk\/keys\/star.key,
-
