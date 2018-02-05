@@ -35,12 +35,12 @@ exit 1
 } >&2
 
 #check for empty params
-if [ $# -eq 0 ]
-  then
-    echo "No arguments supplied"
-    print_args
-    exit 1
-fi
+#if [ $# -eq 0 ]
+#  then
+#    echo "No arguments supplied"
+#    print_args
+#    exit 1
+#fi
 
 
 # read the options
@@ -53,12 +53,12 @@ do
         case "$1" in
         --public-ip)
                 case $2 in
-                        "") print_args ;;
+                        #"") print_args ;;
                         *) PUBLIC_IP=$2; shift 2 ;;
                 esac ;;
         --local-ip)
                 case "$2" in
-                        "") print_args ;;
+                        #"") print_args ;;
                         *) LOCAL_IP=$2; shift 2 ;;
                 esac ;;
         --dialin)
@@ -164,7 +164,7 @@ fi
 
 # installing pre-requisite packages
 echo "Installing pre-requisite packages for Asterisk and PJPROJECT"
-yum -y install -y epel-release bzip2 dmidecode gcc-c++ ncurses-devel libxml2-devel make wget netstat telnet vim zip unzip openssl-devel newt-devel kernel-devel libuuid-devel gtk2-devel jansson-devel binutils-devel git libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel mysql-connector-odbc tcpdump patch sqlite
+yum -y install -y epel-release bzip2 dmidecode gcc-c++ ncurses-devel libxml2-devel make wget netstat telnet vim zip unzip openssl-devel newt-devel kernel-devel libuuid-devel gtk2-devel jansson-devel binutils-devel git libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel mysql-connector-odbc tcpdump patch sqlite bind-utils
 
 #download Asterisk
 cd /usr/src
@@ -177,10 +177,15 @@ sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 
 #install PJSIP and asterisk
 
-./configure --with-pjproject-bundled
-make
-make install
-make config
+cd $startPath
+# Apply custom Asterisk patches, then apply custom PJPROJECT patch and install PJ and Asterisk
+./patch_and_config.sh --patch
+./build_pjproject.sh
+
+#./configure --with-pjproject-bundled
+#make
+#make install
+#make config
 
 #run ldconfig so that Asterisk finds PJPROJECT packages
 echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
@@ -190,7 +195,8 @@ echo "Generating the Asterisk self-signed certificates. You will be prompted to 
 sleep 2
 
 #generate TIS certificates
-./contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
+PUBLIC_IP=$(nslookup $HOSTNAME | grep Address | tail -1 | awk '{print $2}')
+/usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 
 # pull down confi/media files and add to /etc/asterisk and /var/lib/asterisk/sounds, respectively
 #cd ~
@@ -207,17 +213,20 @@ chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 
 #modify configs with named params
 
-cd /etc/asterisk
+cd $startPath
+./patch_and_config.sh --config --db --restart
 
-sed -i -e "s/<public_ip>/$PUBLIC_IP/g" pjsip.conf
-sed -i -e "s/<local_ip>/$LOCAL_IP/g" pjsip.conf
-sed -i -e "s/<dialin>/$DIALIN/g" extensions.conf pjsip.conf
-sed -i -e "s/<stun_server>/$STUN_SERVER/g" rtp.conf res_stun_monitor.conf
-sed -i -e "s/<crt_file>/$CRT_FILE/g" http.conf pjsip.conf
-sed -i -e "s/<crt_key>/$CRT_KEY/g" http.conf pjsip.conf
-sed -i -e "s/<ss_cert>/\/etc\/asterisk\/keys\/asterisk.pem/g" pjsip.conf
-sed -i -e "s/<ss_ca_crt>/\/etc\/asterisk\/keys\/ca.crt/g" pjsip.conf
-sed -i -e "s/<hostname>/$HOSTNAME/g" pjsip.conf
+#cd /etc/asterisk
+
+#sed -i -e "s/<public_ip>/$PUBLIC_IP/g" pjsip.conf
+#sed -i -e "s/<local_ip>/$LOCAL_IP/g" pjsip.conf
+#sed -i -e "s/<dialin>/$DIALIN/g" extensions.conf pjsip.conf
+#sed -i -e "s/<stun_server>/$STUN_SERVER/g" rtp.conf res_stun_monitor.conf
+#sed -i -e "s/<crt_file>/$CRT_FILE/g" http.conf pjsip.conf
+#sed -i -e "s/<crt_key>/$CRT_KEY/g" http.conf pjsip.conf
+#sed -i -e "s/<ss_cert>/\/etc\/asterisk\/keys\/asterisk.pem/g" pjsip.conf
+#sed -i -e "s/<ss_ca_crt>/\/etc\/asterisk\/keys\/ca.crt/g" pjsip.conf
+#sed -i -e "s/<hostname>/$HOSTNAME/g" pjsip.conf
 
 echo ""
 echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"

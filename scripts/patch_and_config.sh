@@ -352,7 +352,7 @@ function install_configs {
 	configStatus=true
 
 	# modify the files with sed
-	INPUT=config_instructions.csv
+	INPUT=.config
 	OLDIFS=$IFS
 	
 	if [ ! -f $INPUT ]; then
