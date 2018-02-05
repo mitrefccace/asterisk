@@ -3,8 +3,6 @@
 #This will stop the script if any of the commands fail
 set -e
 
-# cjm-jan18
-source /etc/environment
 startPath=$(pwd)
 
 #set variable names
