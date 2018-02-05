@@ -55,6 +55,10 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+if [ ! -f $INPUT ]; then
+                print_message "Error" "$INPUT file not found. Please create the $INPUT and try again. Refer the the README for more info."
+                exit 1
+fi
 
 # Retreive the public IP from the .config. If it wasn't loaded, fail the script.
 IFS=","
