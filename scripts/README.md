@@ -70,9 +70,10 @@ Note the format of the CA cert and key, namely using '\/' to represent directory
 4. Execute script  
 
 ## Asterisk Database Initialization 
-* If the PAC script is run with the __--db__ flag or a __--dialin__ number is specified, it will 
-check the Asterisk database for the following values :
-(GLOBAL DIALIN, BUSINESS_HOURS START, BUSINESS_HOURS END, BUSINESS_HOURS ACTIVE). 
+* Each time the PAC script is run, it will check that the Asterisk service is running. 
+If it is not, the installation will be canceled. 
+* Additionally, if the __--no-db__ flag is not used, then it will check the database 
+for the following values : (GLOBAL DIALIN, BUSINESS_HOURS START, BUSINESS_HOURS END, BUSINESS_HOURS ACTIVE). 
 * If any of these values are missing in the DB, the user will be prompted for information.
 * If the entered value is not accepted, then the user will be re-prompted. 
 * If the dialin flag is specified, then the DB value for this field will be modified. 

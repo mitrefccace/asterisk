@@ -21,7 +21,7 @@ function show_instructions {
 		echo "+            --help     : Optional : Displays these program instructions                          +"
 		echo "+            --patch    : Required : Applies patch files to source code                           +"
 		echo "+            --config   : Required : Copies configuration files into /etc/asterisk/               +"
-		echo "+            --db       : Required : Sets Asterisk database values                                +"
+		echo "+            --no-db    : Optional : Prevents the script from checking DB values                  +"
 		echo "+            --version  : Optional : Specifies which version of Asterisk to look for              +"
 		echo "+            --no-build : Optional : Opts not to build the source code                            +"
 		echo "+            --restart  : Optional : Restarts Asterisk                                            +"
@@ -62,7 +62,7 @@ function error_check_args {
         # parse all of the input arguments
 	patch=false
 	config=false
-	db=false
+	db=true
 	build=true
 	restartArg=false
         cliArg=false
@@ -94,8 +94,8 @@ function error_check_args {
 			--config)
 				config=true
 				;;
-			--db)
-				db=true
+			--no-db)
+				db=false
 				;;
 			--version)
 				nextIsVersion=true
@@ -120,7 +120,6 @@ function error_check_args {
 	
 	# check asterisk service status
 	check_ast_status
-
 	# initialize the asterisk database with business hours
 	if [[ $db == "true" ]] || [[ $phoneNum != "" ]]; then
 		init_ast_db $phoneNum
@@ -340,13 +339,12 @@ function install_configs {
 	
 	# alert user of the asterisk dialin number
 	dialin=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
-	# Error check
-	rez=$(error_check_num $dialin)	
+	rez=$(error_check_num $dialin)
 	if [ $rez == "pass" ]; then
-		print_message "Notify" "this machine's dialin number has been set to ---> ${dialin}"
+		print_message "Notify" "this machine's dialin number has been detected ---> ${dialin}"
 	else
-		print_message "Error" "no dialin number present for Asterisk. Please run script again with --db ---> Installation canceled"
-		exit 1	
+		print_message "Error" "the Asterisk database does not contain a dialin number ---> Installation Canceled"
+		exit 1
 	fi
 	# alert user of th global address
 	globalIP=$(dig +short ${hostName})
@@ -528,7 +526,7 @@ function init_ast_db {
 function check_ast_status {
 	rez=$(service asterisk status | grep Active | cut -d ':' -f2 | cut -d ' ' -f2)
 	if [[ $rez != "active" ]]; then
-		print_message "Error" "Asterisk service is unreahcable ---> Installation canceled"
+		print_message "Error" "Asterisk service is unreachable ---> Installation canceled"
 		exit 1
 	fi
 }
