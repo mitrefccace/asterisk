@@ -1,3 +1,4 @@
+<hostname>,pjsip.conf,vasip.task3acrdemo.com,
 <local_ip>,pjsip.conf,172.21.1.118,
 <public_ip>,pjsip.conf,34.196.112.243,
 <stun_server>,rtp.conf|res_stun_monitor.conf,stun.task3acrdemo.com,
