@@ -37,6 +37,11 @@ Before executing the install script, you MUST modify this file with the values f
 * <stun_server>: STUN/TURN server address:port. We recommend building a dedicated STUN server, as public STUN servers can become congested and lead to higher latency for STUN/ICE. If you do not have one, a Google STUN server will be used in the config instead.
 * <crt_file>: CA cert file for server. Generated self-signed cert is used if none is provided.
 * <crt_key>: Private key for CA cert
+* <cdr_table>: MySQL Table name used for CDR
+* <cdr_user> : MySQL username used by Asterisk to write CDR records
+* <cdr_pass>: Password for above MySQL username
+
+(Note: the OS will need additional configurations to enable Asterisk to connect to MySQL. See the docs directory in the main ACE Direct repo for more info.)
 
 ## Twilio
 
