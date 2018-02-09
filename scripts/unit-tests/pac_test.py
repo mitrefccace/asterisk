@@ -20,7 +20,10 @@ class CornerCases(unittest.TestCase):
 		
 	@classmethod
 	def setUpClass(cls):
+		# move into scripts dir
 		os.chdir('../')
+		# temporarily change the .config.sample file name
+		os.rename('./.config.sample', './.config')
 	
 	def test_ast_service_down(self):
        		# stop asterisk service
@@ -83,6 +86,8 @@ class CornerCases(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
+		# change the config file name back
+		os.rename('./.config', './.config.sample')
 		os.chdir('./unit-tests')
 
 class BaseCommand(object):
