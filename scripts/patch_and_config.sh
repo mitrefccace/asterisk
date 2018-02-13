@@ -136,6 +136,9 @@ function error_check_args {
         if [[ $config == "true" ]]; then
 		install_configs 
 	fi
+	if [[ $media == "true" ]]; then
+		install_media
+	fi
 	# handle any remaingin arg commands
 	execute_args $restartArg $cliArg 
 }
