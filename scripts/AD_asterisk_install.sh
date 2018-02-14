@@ -143,7 +143,7 @@ sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 
 cd $startPath
 # Apply custom Asterisk patches, then apply custom PJPROJECT patch and install PJ and Asterisk
-./patch_and_config.sh --patch --no-build
+./update_asterisk.sh --patch --no-build
 ./build_pjproject.sh
 
 #run ldconfig so that Asterisk finds PJPROJECT packages
@@ -169,7 +169,7 @@ chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 #modify configs with named params
 
 cd $startPath
-./patch_and_config.sh --config --restart
+./update_asterisk.sh --config --restart
 
 echo ""
 echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"

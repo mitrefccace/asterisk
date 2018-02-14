@@ -27,10 +27,10 @@ The __./patches__ directory contains the following:
 
 |                 Command                                            | Purpose                                                                                  |
 | -------------------------------------------------------------------| -----------------------------------------------------------------------------------------|
-| `$ ./patch_and_config.sh --help`                                   | Provides instructions                                                                    |
-| `$ ./patch_and_config.sh --version 15.1.2 --patch --build`         | Applies patches to asterisk-15.1.2 source code and then rebuilds it                      |
-| `$ ./patch_and_config.sh --config --dialin 8003671294`             | Installs the configuration files using the provided phone number                         |
-| `$ ./patch_and_config.sh --patch --build --config --restart --cli` | Applies the patches, rebuilds the source, restarts Asterisk and starts the CLI           |
+| `$ ./update_asterisk.sh --help`                                   | Provides instructions                                                                    |
+| `$ ./update_asterisk.sh --version 15.1.2 --patch --build`         | Applies patches to asterisk-15.1.2 source code and then rebuilds it                      |
+| `$ ./update_asterisk.sh --config --dialin 8003671294`             | Installs the configuration files using the provided phone number                         |
+| `$ ./update_asterisk.sh --patch --build --config --restart --cli` | Applies the patches, rebuilds the source, restarts Asterisk and starts the CLI           |
 
 ### Configuration Files
 -----------------------------------------
