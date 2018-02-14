@@ -64,6 +64,7 @@ function error_check_args {
 	config=false
 	db=true
 	build=true
+	media=false
 	restartArg=false
         cliArg=false
 	nextIsNum=false
@@ -96,6 +97,9 @@ function error_check_args {
 				;;
 			--no-db)
 				db=false
+				;;
+			--media)
+				media=true
 				;;
 			--version)
 				nextIsVersion=true
@@ -131,6 +135,9 @@ function error_check_args {
 	# run installation function
         if [[ $config == "true" ]]; then
 		install_configs 
+	fi
+	if [[ $media == "true" ]]; then
+		install_media
 	fi
 	# handle any remaingin arg commands
 	execute_args $restartArg $cliArg 
@@ -317,6 +324,38 @@ function apply_asterisk_patches {
                         print_message "Notify" "aborting the build process ---> Pacthes applied but source not built"
                 fi
         fi
+}
+
+function install_media {
+	# check that we are in the proper directory 
+	AD=$(pwd)
+	current_dir=$(basename $AD)
+        if ! [[ $current_dir == "scripts" ]]; then
+		print_message "Error" "you are not executing this script from the proper scripts directory ---> Installation Canceled."
+		exit 1
+	fi
+
+	mediaFiles=$(find ../media -name '*.*')
+	mediaDir=/var/lib/asterisk/sounds
+	mediaStatus=true
+	echo "============================================================"
+	for file in $mediaFiles
+	do
+		yes | cp -rf $file $mediaDir 2>/dev/null
+		if [[ $? == "0" ]]; then
+			print_message "Notify" "copied ${file} ---> $mediaDir"
+		else
+			mediaStatus=false
+			print_message "Error" "failed to copy ${file} ---> $mediaDir"
+		fi
+	done
+
+	# setup complete
+	if [[ $mediaStatus == "true" ]]; then
+		print_message "Success"  "Media file apply complete"
+	else
+		print_message "Error" "failed to apply media files"
+	fi
 }
 
 function install_configs {
