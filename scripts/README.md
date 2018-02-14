@@ -62,7 +62,7 @@ $ sed -i -e 's/<password>/<the password you choose>/g' pjsip.conf
 
 --------------------------------------------
 
-## patch_and_config.sh Instructions
+## update_asterisk.sh Instructions
 1. Clone this repo to the destination. 
 2. Move into __asterisk__.
 3. Execute `sudo su` 
@@ -115,7 +115,7 @@ the project after applying the patches.
 ## Example usage
 
 ```sh
-$ ./patch_and_config.sh --version 15.1.2 --patch --config --dialin 7032935641 --restart --cli
+$ ./update_asterisk.sh --version 15.1.2 --patch --config --dialin 7032935641 --restart --cli
 
 ```
 * The example above will look for the asterisk-15.1.2 repository so that it can apply the patch files then rebuild
