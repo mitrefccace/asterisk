@@ -31,7 +31,7 @@ class CornerCases(unittest.TestCase):
 		rez = com.execute(1)
        	
        		# check the output of PAC
-		com = OsCommand('sudo ./patch_and_config.sh --config')
+		com = OsCommand('sudo ./update_asterisk.sh --config')
 		rez = com.execute(0)
 		correct = '\x1b[31mError -- \x1b(B\x1b[mAsterisk service is unreachable ---> Installation canceled\n'
 		self.assertEqual(rez, correct)
@@ -42,14 +42,14 @@ class CornerCases(unittest.TestCase):
        
 	def test_bad_input(self):
        		# check for unrecognized command line args
-		com = OsCommand('sudo ./patch_and_config.sh --config patch ---no-db')
+		com = OsCommand('sudo ./update_asterisk.sh --config patch ---no-db')
 		rez = com.execute(0)
-		correct = "\x1b[31mError -- \x1b(B\x1b[munkown argument: try running './patch_and_config.sh --help' for more information  ---> exiting program\n"
+		correct = "\x1b[31mError -- \x1b(B\x1b[munkown argument: try running './update_asterisk.sh --help' for more information  ---> exiting program\n"
 		self.assertEqual(rez, correct)
        
 	def test_config_install(self):
        		# check the entire configuration process for successs
-		com = OsCommand('sudo ./patch_and_config.sh --config')
+		com = OsCommand('sudo ./update_asterisk.sh --config')
 		rez = com.execute(0)
 		lines = rez.split('\n')
 		status = lines.pop()
@@ -71,7 +71,7 @@ class CornerCases(unittest.TestCase):
 		self.assertEqual(rez, correct) 
 	
 		# check the behavior of PAC
-		com = OsCommand('sudo ./patch_and_config.sh --config --no-db')
+		com = OsCommand('sudo ./update_asterisk.sh --config --no-db')
 		rez = com.execute(0)
 		lines = rez.split('\n')
 		status = lines.pop()

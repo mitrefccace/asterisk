@@ -11,16 +11,18 @@
 function show_instructions {
 		echo
 		echo "+-------------------------------------------------------------------------------------------------+"
-		echo "+ Run this script if:                                                                             +"
-		echo "+                      1. You would like to apply patches to Asterisk source code                 +"
-		echo "+                      2. You would like to install the configuration files to /etc/asterisk/     +"
+		echo "+ Run this script if you would like to:                                                           +"
+		echo "+                      1. Apply patches to Asterisk source code                                   +"
+		echo "+                      2. Install the configuration files to /etc/asterisk/                       +"
+		echo "+                      3. Install the media files to /var/lib/asterisk/sounds                     +"
 		echo "+                                                                                                 +"
 		echo "+                                                                                                 +"
-		echo "+ ./patch_and_config.sh [Required_Flag] [Optional_Flag]                                           +"
+		echo "+ ./update_asterisk.sh [Optional_Flags]                                                           +"
 		echo "+                                                                                                 +"
 		echo "+            --help     : Optional : Displays these program instructions                          +"
-		echo "+            --patch    : Required : Applies patch files to source code                           +"
-		echo "+            --config   : Required : Copies configuration files into /etc/asterisk/               +"
+		echo "+            --patch    : Optional : Applies patch files to source code                           +"
+		echo "+            --config   : Optional : Copies configuration files into /etc/asterisk/               +"
+		echo "+            --media    : Optional : Copies media files into /var/lib/asterisk/sounds             +"
 		echo "+            --no-db    : Optional : Prevents the script from checking DB values                  +"
 		echo "+            --version  : Optional : Specifies which version of Asterisk to look for              +"
 		echo "+            --no-build : Optional : Opts not to build the source code                            +"
@@ -55,7 +57,7 @@ function print_message {
 function error_check_args {
         # handle no arguments
         if [[ $@ == "" ]]; then
-                print_message "Error" "try running './patch_and_config.sh --help' for more information  ---> exiting program"
+                print_message "Error" "try running './update_asterisk.sh --help' for more information  ---> exiting program"
                 exit 1
         fi
 
@@ -117,7 +119,7 @@ function error_check_args {
 				nextIsNum=true
 				;;
                         *)
-                                print_message "Error" "unkown argument: try running './patch_and_config.sh --help' for more information  ---> exiting program"
+                                print_message "Error" "unkown argument: try running './update_asterisk.sh --help' for more information  ---> exiting program"
                                 exit 1
                 esac
         done
