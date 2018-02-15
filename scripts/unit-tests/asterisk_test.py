@@ -46,7 +46,40 @@ class AsteriskTests(unittest.TestCase):
 			objFound = lines.pop()
 		numEndpoints = int(objFound.split(':')[1].strip())
 		self.assertGreater(numEndpoints, 0)
-		
+	
+	def test_db_entries(self):
+		com = AstCommand('database show')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		objFound = lines.pop()
+		while objFound is "":
+			objFound = lines.pop()
+		numEntries = int(objFound.split(' ')[0].strip())
+		self.assertGreater(numEntries, 0)		
+
+	def test_cdr_db(self):
+		com = AstCommand('cdr show status')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		status = ''
+		for line in lines:
+			words = line.split(':')
+			for i, word in enumerate(words):
+				clean = word.strip()
+				if clean == 'Logging':
+					status = words[i+1].strip()
+		self.assertEqual(status, "Enabled")
+			
+	def test_stun_server(self):
+		com = AstCommand('stun show status')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		stunLine = lines.pop()
+		while stunLine is "":
+			stunLine = lines.pop()
+		stun = stunLine.split(' ')[0].strip()
+		self.assertEqual(stun, 'stun.task3acrdemo.com')		
+
 	@classmethod
 	def tearDownClass(cls):
 		# change the config file name back
