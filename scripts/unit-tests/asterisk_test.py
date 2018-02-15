@@ -5,6 +5,7 @@
 # Date    : 15 Feb 2018
 # Purpose : to provide a unit test for Asterisk
 
+import commands as Commands
 import subprocess as sub
 import unittest
 import abc
@@ -24,21 +25,21 @@ class AsteriskTests(unittest.TestCase):
 	
 	def test_ast_service_down(self):
        		# stop asterisk service
-		com = OsCommand('sudo service asterisk stop')
+		com = Commands.OsCommand('sudo service asterisk stop')
 		rez = com.execute(1)
        	
        		# check the output of PAC
-		com = OsCommand('sudo ./update_asterisk.sh --config')
+		com = Commands.OsCommand('sudo ./update_asterisk.sh --config')
 		rez = com.execute(0)
 		correct = '\x1b[31mError -- \x1b(B\x1b[mAsterisk service is unreachable ---> Installation canceled\n'
 		self.assertEqual(rez, correct)
        	
 		# start the asterisk service back up
-		com = OsCommand('sudo service asterisk start')
+		com = Commands.OsCommand('sudo service asterisk start')
 		rez = com.execute(1)
 	
 	def test_pjsip_endpoints(self):
-		com = AstCommand('pjsip show endpoints')
+		com = Commands.AstCommand('pjsip show endpoints')
 		rez = com.execute(0)
 		lines = rez.split('\n')
 		objFound = lines.pop()
@@ -48,7 +49,7 @@ class AsteriskTests(unittest.TestCase):
 		self.assertGreater(numEndpoints, 0)
 	
 	def test_db_entries(self):
-		com = AstCommand('database show')
+		com = Commands.AstCommand('database show')
 		rez = com.execute(0)
 		lines = rez.split('\n')
 		objFound = lines.pop()
@@ -58,7 +59,7 @@ class AsteriskTests(unittest.TestCase):
 		self.assertGreater(numEntries, 0)		
 
 	def test_cdr_db(self):
-		com = AstCommand('cdr show status')
+		com = Commands.AstCommand('cdr show status')
 		rez = com.execute(0)
 		lines = rez.split('\n')
 		status = ''
@@ -71,7 +72,7 @@ class AsteriskTests(unittest.TestCase):
 		self.assertEqual(status, "Enabled")
 			
 	def test_stun_server(self):
-		com = AstCommand('stun show status')
+		com = Commands.AstCommand('stun show status')
 		rez = com.execute(0)
 		lines = rez.split('\n')
 		stunLine = lines.pop()
@@ -86,35 +87,6 @@ class AsteriskTests(unittest.TestCase):
 		os.rename('./.config', './.config.sample')
 		os.chdir('./unit-tests')
 
-class BaseCommand(object):
-	__metaclass__ = abc.ABCMeta
-
-	@abc.abstractmethod
-	def execute(self, sleep_time):
-		ps = sub.Popen(self.command_list, stdout=sub.PIPE)
-		(output, err) = ps.communicate()
-		if sleep_time:
-			time.sleep(sleep_time)
-		if not err:
-			return output			
-
-class OsCommand(BaseCommand):
-	
-	def __init__(self, cs):
-		self.command_list = cs.split()
-
-	def execute(self, sleep_time):
-		return super(OsCommand, self).execute(sleep_time)
-
-class AstCommand(BaseCommand):
-	
-	def __init__(self, cs):
-		self.command_list = ['sudo', 'asterisk', '-rx']
-		self.command_list.append(cs)
-
-	def execute(self, sleep_time):
-		return super(AstCommand, self).execute(sleep_time)		
-
-
+		
 if __name__ == '__main__':
 	sys.exit(unittest.main())
