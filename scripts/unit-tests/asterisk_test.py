@@ -81,6 +81,18 @@ class AsteriskTests(unittest.TestCase):
 		stun = stunLine.split(' ')[0].strip()
 		self.assertEqual(stun, 'stun.task3acrdemo.com')		
 
+	def test_queues(self):
+		com = Commands.AstCommand('queue show')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		queues = []
+		for line in lines:
+			position = line.find('Queue')
+			if position > 0:
+				queue = line.split(' ')[0].strip()
+				queues.append(queue)
+		self.assertEqual(len(queues), 3)
+
 	@classmethod
 	def tearDownClass(cls):
 		# change the config file name back
