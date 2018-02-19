@@ -21,8 +21,20 @@ class AsteriskTests(unittest.TestCase):
 		# move into scripts dir
 		os.chdir('../')
 		# temporarily change the .config.sample file name
-		os.rename('./.config.sample', './.config')
-	
+		configFound = False
+		for root, dirs, files in os.walk('.'):  
+			for fileName in files:
+				if fileName == '.config.sample':
+					os.rename('.config.sample', '.config')
+					configFound = True
+					break	
+				elif fileName == '.config':
+					configFound = True
+					break
+		if not configFound:
+			print('Could not find the .config file in the parent directory ---> Aborting Test')
+			sys.exit(-1)
+
 	def test_ast_service_down(self):
        		# stop asterisk service
 		com = Commands.OsCommand('sudo service asterisk stop')
@@ -84,6 +96,9 @@ class AsteriskTests(unittest.TestCase):
 	def test_queues(self):
 		com = Commands.AstCommand('queue show')
 		rez = com.execute(0)
+		# sometimes the queue show returns 'No such command' so loop to get proper resp
+		while rez.split(' ')[0].strip() == 'No':
+			rez = com.execute(0)
 		lines = rez.split('\n')
 		queues = []
 		for line in lines:
