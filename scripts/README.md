@@ -66,11 +66,11 @@ $ sed -i -e 's/<password>/<the password you choose>/g' pjsip.conf
 1. Clone this repo to the destination. 
 2. Move into __asterisk__.
 3. Execute `sudo su` 
-4. Modify config_instructions.csv 
-4. Execute script  
+4. Modify values within .config 
+5. Execute script  
 
 ## Asterisk Database Initialization 
-* Each time the PAC script is run, it will check that the Asterisk service is running. 
+* Each time this update script is run, it will check that the Asterisk service is running. 
 If it is not, the installation will be canceled. 
 * Additionally, if the __--no-db__ flag is not used, then it will check the database 
 for the following values : (GLOBAL DIALIN, BUSINESS_HOURS START, BUSINESS_HOURS END, BUSINESS_HOURS ACTIVE). 
@@ -78,13 +78,13 @@ for the following values : (GLOBAL DIALIN, BUSINESS_HOURS START, BUSINESS_HOURS 
 * If the entered value is not accepted, then the user will be re-prompted. 
 * If the dialin flag is specified, then the DB value for this field will be modified. 
 ## Configuration files
-##### config_instructions.csv
+##### .config
 * This is a comma separated value file which contains file modification instructions
 for some of the tracked configuration files. 
 * The line format is <place_holder>,file_1|file_2|...|file_n,value.
 * Each file will be modifed so the place holder within it is replaced with the included value.
 ##### Error checking
-* The domain name is checked to make sure the __dig__ command can resolve the address. 
+* The server's hostname is checked to make sure the __dig__ command can resolve the domain to an IPV4 address. 
 If not, it returns an error. 
 * The phone number is validated by checking that it is composed of only numbers [0-9] 
 and contains only 10 total digits. If not, it returns an error.
@@ -94,6 +94,12 @@ If not, it will loop untill the user enters a proper value for the Asterisk DB.
 * These are made by executing sed commands to perform a search and replace on the files.
 * The modifications are made within a temporary directory so that the original files are 
 not altered. 
+
+## Media files
+
+#### Process
+* If the __--media__ file flag is used as an argument, then all of the media files within this repository 
+will be copied into /var/lib/asterisk/sounds. 
 
 ## Patch files
 
@@ -115,7 +121,7 @@ the project after applying the patches.
 ## Example usage
 
 ```sh
-$ ./update_asterisk.sh --version 15.1.2 --patch --config --dialin 7032935641 --restart --cli
+$ ./update_asterisk.sh --version 15.1.2 --patch --config --dialin 7032935641 --media --restart --cli
 
 ```
 * The example above will look for the asterisk-15.1.2 repository so that it can apply the patch files then rebuild
