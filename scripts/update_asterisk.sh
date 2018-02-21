@@ -395,6 +395,9 @@ function install_configs {
 	# WARNING -- the following line could pose a problem to 'dual-homes' networks
 	localIP=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
 	print_message "Notify" "this machine's local IP has been detected ---> ${localIP}"
+	
+	# move odbc.ini.sample to /etc. Doing this manually for now, maybe we can make this dynamic?
+	cp odbc.ini.sample /etc/odbc.ini
 
 	# status for user info
 	configStatus=true
