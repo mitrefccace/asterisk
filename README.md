@@ -1,6 +1,6 @@
 # **Asterisk for ACE Direct Project**
 
-This repository is to be used in conjunction with the documentation for the ACE Direct project (found on the project's [main page](https://github.com/FCC/ACEDirect/tree/master/docs)). The two directories contain configuration files for Asterisk, as well as the media files used for this version of Asterisk. Please read this entire document before installing Asterisk for ACE Direct.
+This repository is to be used in conjunction with the documentation for the ACE Direct project (found on the project's [main page](https://github.com/FCC/ACEDirect/tree/master/docs)). The two directories contain configuration and media files to be used with this version of Asterisk. Please read this entire document before installing Asterisk for ACE Direct.
 
 ## Prerequisites
 
@@ -12,15 +12,7 @@ The Asterisk for ACE Direct configuration assumes the following:
 
 ## Download/Configure
 
-Once Asterisk and our custom PJSIP project have been installed on a server (see the "Automation" section below), pull down the repo containing the ACE Direct configs and media:
-
-
-```sh
-
-$ git clone <asterisk_repo_URL>
-$ cd asterisk
-
-```
+Please follow the automated installation instructions which have been outlined and exaplined within the scripts/ directory.
 
 ## Modules
 
