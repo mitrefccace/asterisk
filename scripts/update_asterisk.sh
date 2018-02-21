@@ -124,10 +124,10 @@ function error_check_args {
                 esac
         done
 	
-	# check asterisk service status
-	check_ast_status
-	# initialize the asterisk database with business hours
+	# check_ast_status, then initialize the 
+	# asterisk database with business hours
 	if [[ $db == "true" ]] || [[ $phoneNum != "" ]]; then
+		check_ast_status
 		init_ast_db $phoneNum
 	fi
 	# run patch function 
