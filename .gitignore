@@ -1,3 +1,4 @@
 *TODO*
 scripts/.config
 Jenkinsfile
+scripts/unit-tests/*.pyc

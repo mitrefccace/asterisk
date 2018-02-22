@@ -22,45 +22,14 @@ $ cd asterisk
 
 ```
 
-Then modify the following elements in the following files:
+Within the scripts directory, there is a hidden configuration file (.config) which contains place holder values to be used by Asterisk. 
+This file is a CSV and is in the format place-holdr,file|file,value.
+You will need to configure the default values on each line of this file for the Asterisk instance. 
 
-* pjsip.conf:
-    * <public_ip>: The external.public IP address of the Asterisk server
-    * <local_ip>: The private/local IP address of the Asterisk
-	* <ss_crt>: Self-signed cert file for server (follow [these instructions](https://wiki.asterisk.org/wiki/display/AST/Secure+Calling+Tutorial) to create a self-signed cert for Asterisk)
-	* <ss_ca_crt>: The CA file used to generate the above self-signed cert
-* extensions.conf:
-	* <dial_in>: Dial-in number
-* http.conf & pjsip.conf:
-    * <crt_file>: SSL certificate for Asterick server
-    * <crt_key>: Private key for Asterisk server 
-* rtp.conf:
-	* <stun_server>: STUN/TURN server address:port (we recommend building a dedicated STUN server, but a public STUN server can be used if desired)
-    
-Once the values have been modified, move the files over to /etc/asterisk:
+Once the configurations have been implemented, run the following command to update Configuration files and media files:
 
 ```sh
-
-$ cd config
-$ cp -rf * /etc/asterisk
-
-```
-
-Then, move the media files into /var/lib/asterisk/sounds:
-
-```sh
-
-$ cd ../media
-$ cp -rf * /var/lib/asterisk/sounds
-
-```
-
-Finally, restart Asterisk:
-
-```sh
-
-$ service asterisk start
-
+sudo ./update_asterisk.sh -config --media --restart
 ```
 
 ## Modules
