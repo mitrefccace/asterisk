@@ -4,6 +4,8 @@
 <stun_server>,rtp.conf|res_stun_monitor.conf,stun.task3acrdemo.com,
 <crt_file>,pjsip.conf|http.conf,\/etc\/asterisk\/keys\/star.pem,
 <crt_key>,pjsip.conf|http.conf,\/etc\/asterisk\/keys\/star.key,
+<cdr_host>,/etc/odbc.ini,hostname
+<cdr_db>,/etc/odbc.ini,database
 <cdr_table>,cdr_adaptive_odbc.conf|cdr_odbc.conf,qasip,
-<cdr_user>,res_odbc.conf,asterisk,
-<cdr_pass>,res_odbc.conf,somePass,
+<cdr_user>,res_odbc.conf|/etc/odbc.ini,asterisk,
+<cdr_pass>,res_odbc.conf|/etc/odbc.ini,somePass,

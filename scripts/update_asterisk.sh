@@ -124,10 +124,10 @@ function error_check_args {
                 esac
         done
 	
-	# check asterisk service status
-	check_ast_status
-	# initialize the asterisk database with business hours
+	# check_ast_status, then initialize the 
+	# asterisk database with business hours
 	if [[ $db == "true" ]] || [[ $phoneNum != "" ]]; then
+		check_ast_status
 		init_ast_db $phoneNum
 	fi
 	# run patch function 
@@ -395,6 +395,11 @@ function install_configs {
 	# WARNING -- the following line could pose a problem to 'dual-homes' networks
 	localIP=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
 	print_message "Notify" "this machine's local IP has been detected ---> ${localIP}"
+	
+	# move odbc.ini.sample to /etc. 
+	# TODO: Doing this manually for now, maybe we can make this dynamic?
+	cp odbc.ini.sample /etc/odbc.ini
+	print_message "Notify" "copied odbc.ini.sample ---> /etc/odbc.ini"
 
 	# status for user info
 	configStatus=true
@@ -413,6 +418,7 @@ function install_configs {
 		for file in $configFiles
 		do
 			cp $file /etc/asterisk/
+
 			if [[ $? == "0" ]]; then
 				print_message "Notify" "copied ${file} ---> /etc/asterisk/"
 			else
@@ -425,11 +431,17 @@ function install_configs {
 		echo "============================================================"
 		while read tag files value
 		do
-			# repeated for each line in the file
+			# repeated for each line in the file 
 			IFS="|"
 			for file in $files;
 			do
-				sed -i 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
+				# If the file variable has a full path associated with it,
+				# this statement will evaluate to true
+				if [ $( dirname $file) != "." ]; then
+					sed -i 's|'$tag'|'$value'|g' "$file"
+				else
+					sed -i 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
+				fi
 				if [[ $? == "0" ]]; then
 					print_message "Notify" "modifed $tag in $file with $value"
 				else

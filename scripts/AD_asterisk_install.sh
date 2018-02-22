@@ -143,7 +143,7 @@ sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 
 cd $startPath
 # Apply custom Asterisk patches, then apply custom PJPROJECT patch and install PJ and Asterisk
-./update_asterisk.sh --patch --no-build
+./update_asterisk.sh --patch --no-build --no-db
 ./build_pjproject.sh
 
 #run ldconfig so that Asterisk finds PJPROJECT packages
@@ -166,7 +166,7 @@ yes | cp -rf media/* /var/lib/asterisk/sounds/
 yes | cp -rf scripts/itrslookup.sh /var/lib/asterisk/agi-bin
 chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 
-#modify configs with named params
+#modify configs with named params and populate AstDB
 
 cd $startPath
 ./update_asterisk.sh --config --restart
