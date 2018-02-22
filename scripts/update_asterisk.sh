@@ -419,6 +419,7 @@ function install_configs {
 			# Adding this as a workaround for odbc.ini for now.......
 			if [ grep "\/" $file ]; then
 				# do nothing
+				echo "1" 1>/dev/null
 			else
 				cp $file /etc/asterisk/
 			fi
