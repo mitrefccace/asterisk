@@ -145,8 +145,6 @@ cd $startPath
 # Apply custom Asterisk patches, then apply custom PJPROJECT patch and install PJ and Asterisk
 ./update_asterisk.sh --patch --no-build --no-db
 ./build_pjproject.sh
-# We need to run update_asterisk.sh again to populate the AstDB
-./update_asterisk --restart
 
 #run ldconfig so that Asterisk finds PJPROJECT packages
 echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
@@ -168,7 +166,7 @@ yes | cp -rf media/* /var/lib/asterisk/sounds/
 yes | cp -rf scripts/itrslookup.sh /var/lib/asterisk/agi-bin
 chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 
-#modify configs with named params
+#modify configs with named params and populate AstDB
 
 cd $startPath
 ./update_asterisk.sh --config --restart
