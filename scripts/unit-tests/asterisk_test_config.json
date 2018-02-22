@@ -1,0 +1,7 @@
+{
+	"asterisk": {
+		"stun": "stun.task3acrdemo.com",
+		"numQueues": 3
+	}
+}
+

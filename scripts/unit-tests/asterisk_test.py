@@ -2,7 +2,7 @@
 
 # Project : ACE Direct Automated Testing 
 # Author  : Connor McCann
-# Date    : 15 Feb 2018
+# Date    : 22 Feb 2018
 # Purpose : to provide a unit test for Asterisk
 
 import commands as Commands
@@ -10,16 +10,23 @@ import subprocess as sub
 import unittest
 import abc
 import sys
+import json
 import time
 import os
 
 
 class AsteriskTests(unittest.TestCase):
-	
+		
 	@classmethod
 	def setUpClass(cls):
+		# load some values from JSON configuration 
+		cls.configFile = "./asterisk_test_config.json"
+		with open(cls.configFile, 'r') as f:
+			cls.configs = json.load(f)
+		
 		# move into scripts dir
 		os.chdir('../')
+		
 		# temporarily change the .config.sample file name
 		configFound = False
 		for root, dirs, files in os.walk('.'):  
@@ -91,7 +98,7 @@ class AsteriskTests(unittest.TestCase):
 		while stunLine is "":
 			stunLine = lines.pop()
 		stun = stunLine.split(' ')[0].strip()
-		self.assertEqual(stun, 'stun.task3acrdemo.com')		
+		self.assertEqual(stun, self.configs["asterisk"]["stun"])		
 
 	def test_queues(self):
 		com = Commands.AstCommand('queue show')
@@ -106,7 +113,7 @@ class AsteriskTests(unittest.TestCase):
 			if position > 0:
 				queue = line.split(' ')[0].strip()
 				queues.append(queue)
-		self.assertEqual(len(queues), 3)
+		self.assertEqual(len(queues), self.configs["asterisk"]["numQueues"])
 
 	@classmethod
 	def tearDownClass(cls):
@@ -117,3 +124,4 @@ class AsteriskTests(unittest.TestCase):
 		
 if __name__ == '__main__':
 	sys.exit(unittest.main())
+
