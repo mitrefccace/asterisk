@@ -399,6 +399,7 @@ function install_configs {
 	# move odbc.ini.sample to /etc. 
 	# TODO: Doing this manually for now, maybe we can make this dynamic?
 	cp odbc.ini.sample /etc/odbc.ini
+	print_message "Notify" "copied odbc.ini.sample ---> /etc/odbc.ini"
 
 	# status for user info
 	configStatus=true
@@ -416,13 +417,7 @@ function install_configs {
 		echo "============================================================"
 		for file in $configFiles
 		do
-			# Adding this as a workaround for odbc.ini for now.......
-			if [ grep "\/" $file ]; then
-				# do nothing
-				echo "1" 1>/dev/null
-			else
-				cp $file /etc/asterisk/
-			fi
+			cp $file /etc/asterisk/
 
 			if [[ $? == "0" ]]; then
 				print_message "Notify" "copied ${file} ---> /etc/asterisk/"
@@ -436,12 +431,13 @@ function install_configs {
 		echo "============================================================"
 		while read tag files value
 		do
-			# repeated for each line in the file
+			# repeated for each line in the file 
 			IFS="|"
 			for file in $files;
 			do
-				# Adding this as a workaround for odbc.ini for now.......
-				if [ grep "\/" $file ]; then
+				# If the file variable has a full path associated with it,
+				# this statement will evaluate to true
+				if [ $( dirname $file) != "." ]; then
 					sed -i 's|'$tag'|'$value'|g' "$file"
 				else
 					sed -i 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
