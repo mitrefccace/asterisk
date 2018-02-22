@@ -396,7 +396,8 @@ function install_configs {
 	localIP=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
 	print_message "Notify" "this machine's local IP has been detected ---> ${localIP}"
 	
-	# move odbc.ini.sample to /etc. Doing this manually for now, maybe we can make this dynamic?
+	# move odbc.ini.sample to /etc. 
+	# TODO: Doing this manually for now, maybe we can make this dynamic?
 	cp odbc.ini.sample /etc/odbc.ini
 
 	# status for user info
@@ -415,7 +416,13 @@ function install_configs {
 		echo "============================================================"
 		for file in $configFiles
 		do
-			cp $file /etc/asterisk/
+			# Adding this as a workaround for odbc.ini for now.......
+			if [ grep "\/" $file ]; then
+				# do nothing
+			else
+				cp $file /etc/asterisk/
+			fi
+
 			if [[ $? == "0" ]]; then
 				print_message "Notify" "copied ${file} ---> /etc/asterisk/"
 			else
@@ -432,7 +439,12 @@ function install_configs {
 			IFS="|"
 			for file in $files;
 			do
-				sed -i 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
+				# Adding this as a workaround for odbc.ini for now.......
+				if [ grep "\/" $file ]; then
+					sed -i 's|'$tag'|'$value'|g' "$file"
+				else
+					sed -i 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
+				fi
 				if [[ $? == "0" ]]; then
 					print_message "Notify" "modifed $tag in $file with $value"
 				else
