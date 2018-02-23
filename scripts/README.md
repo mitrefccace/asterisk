@@ -27,16 +27,19 @@ The Asterisk for ACE Direct configuration assumes the following:
 There is a CSV file in this directory called .config.sample, which serves as a placeholder for custom Asterisk configs. It's structure is as follows:
 
 ``` sh
-<tag for variable in config file>,<file(s) to modify>,<value>,
+<tag for variable in config file>,<file_1>|<file_2>|<file_n>,<value>,
 ```
 
 Before executing the install script, you MUST modify this file with the values for your environment, then change the name of the script to .config. Below is a list of each current parameter in the config file:
 
-* <public_ip>: The external.public IP address of the Asterisk server
+* <hostname>: The domain name associated with the server
 * <local_ip>: The private/local IP address of the Asterisk
+* <public_ip>: The external.public IP address of the Asterisk server
 * <stun_server>: STUN/TURN server address:port. We recommend building a dedicated STUN server, as public STUN servers can become congested and lead to higher latency for STUN/ICE. If you do not have one, a Google STUN server will be used in the config instead.
 * <crt_file>: CA cert file for server. Generated self-signed cert is used if none is provided.
 * <crt_key>: Private key for CA cert
+* <cdr_host>: URI for the MySQL database
+* <cdr_db>: The name of the database to use
 * <cdr_table>: MySQL Table name used for CDR
 * <cdr_user> : MySQL username used by Asterisk to write CDR records
 * <cdr_pass>: Password for above MySQL username
@@ -72,11 +75,15 @@ $ sed -i -e 's/<password>/<the password you choose>/g' pjsip.conf
 ## Asterisk Database Initialization 
 * Each time this update script is run, it will check that the Asterisk service is running. 
 If it is not, the installation will be canceled. 
-* Additionally, if the __--no-db__ flag is not used, then it will check the database 
-for the following values : (GLOBAL DIALIN, BUSINESS_HOURS START, BUSINESS_HOURS END, BUSINESS_HOURS ACTIVE). 
+* However, if the __--no-db__ is used, then this service check will not be performed and the Asterisk internal 
+database will not be checked for the following values : (GLOBAL DIALIN, BUSINESS_HOURS START, BUSINESS_HOURS END, BUSINESS_HOURS ACTIVE). 
 * If any of these values are missing in the DB, the user will be prompted for information.
 * If the entered value is not accepted, then the user will be re-prompted. 
 * If the dialin flag is specified, then the DB value for this field will be modified. 
+## Media files
+#### Process
+* If the __--media__ file flag is used as an argument, then all of the media files within this repository 
+will be copied into /var/lib/asterisk/sounds.
 ## Configuration files
 ##### .config
 * This is a comma separated value file which contains file modification instructions
@@ -86,20 +93,13 @@ for some of the tracked configuration files.
 ##### Error checking
 * The server's hostname is checked to make sure the __dig__ command can resolve the domain to an IPV4 address. 
 If not, it returns an error. 
-* The phone number is validated by checking that it is composed of only numbers [0-9] 
+* The dialin number is validated by checking that it is composed of only numbers [0-9] 
 and contains only 10 total digits. If not, it returns an error.
 * The start and end times are evaluated to make sure they are in the proper ##:## format.
 If not, it will loop untill the user enters a proper value for the Asterisk DB.
 ##### File modifications
 * These are made by executing sed commands to perform a search and replace on the files.
-* The modifications are made within a temporary directory so that the original files are 
-not altered. 
-
-## Media files
-
-#### Process
-* If the __--media__ file flag is used as an argument, then all of the media files within this repository 
-will be copied into /var/lib/asterisk/sounds. 
+* The status of each file modification and placement will be visible in the script output. 
 
 ## Patch files
 
