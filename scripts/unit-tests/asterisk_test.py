@@ -139,11 +139,15 @@ class AsteriskTests(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		# change the config file name back
-		os.rename('./.config', './.config.sample')
-		os.chdir('./unit-tests')
-
+		try:
+			# change the config file name back
+			os.rename('./.config', './.config.sample')
+			os.chdir('./unit-tests')
+		except:
+			print('Error occured during class teardown')
+			sys.exit(-1)
 		
+
 if __name__ == '__main__':
 	sys.exit(unittest.main())
 
