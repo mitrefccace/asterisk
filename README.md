@@ -36,7 +36,7 @@ You will need to configure the default values on each line of this file for the 
 Once the configurations have been implemented, run the following command to update Configuration files and media files:
 
 ```sh
-sudo ./update_asterisk.sh -config --media --restart
+sudo ./update_asterisk.sh --config --media --restart
 ```
 
 ## Modules
