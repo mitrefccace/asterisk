@@ -486,7 +486,7 @@ function install_configs {
 
 function make_backup {
         # this method should work with full file paths and not relative ones
-        # the only input argument will be the directpry you wish to backup
+        # the only input argument will be the directory you wish to backup
         # thus a directory will have to be created within it to store all the files
         parent_dir=$(dirname $1)
 	dir=$(basename $1)
@@ -500,6 +500,12 @@ function make_backup {
         fi
         # copy the files into backup
         cp -rf $1 $backup_dir
+	if [ $? == "0" ]; then
+		print_message "Success" "Backup files copied into $backup_dir"
+	else
+		print_message "Error" "Failed to copy files into $backup_dir ---> Exiting program ..."
+		exit 1
+	fi
 }
 
 function execute_args {
