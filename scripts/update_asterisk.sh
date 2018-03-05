@@ -23,6 +23,7 @@ function show_instructions {
 		echo "+            --patch    : Optional : Applies patch files to source code                           +"
 		echo "+            --config   : Optional : Copies configuration files into /etc/asterisk/               +"
 		echo "+            --media    : Optional : Copies media files into /var/lib/asterisk/sounds             +"
+		echo "+            --backup   : Optional : Copies direcotry files to backup directory before installing +"
 		echo "+            --no-db    : Optional : Prevents the script from checking DB values                  +"
 		echo "+            --version  : Optional : Specifies which version of Asterisk to look for              +"
 		echo "+            --no-build : Optional : Opts not to build the source code                            +"
@@ -64,6 +65,7 @@ function error_check_args {
         # parse all of the input arguments
 	patch=false
 	config=false
+	backup=false
 	db=true
 	build=true
 	media=false
@@ -96,6 +98,9 @@ function error_check_args {
 				;;
 			--config)
 				config=true
+				;;
+			--backup)
+				backup=true
 				;;
 			--no-db)
 				db=false
@@ -136,10 +141,10 @@ function error_check_args {
 	fi
 	# run installation function
         if [[ $config == "true" ]]; then
-		install_configs 
+		install_configs $backup 
 	fi
 	if [[ $media == "true" ]]; then
-		install_media
+		install_media $backup
 	fi
 	# handle any remaingin arg commands
 	execute_args $restartArg $cliArg 
@@ -329,6 +334,9 @@ function apply_asterisk_patches {
 }
 
 function install_media {
+	# first arg corresponds with backup flag
+	backup=$1
+
 	# check that we are in the proper directory 
 	AD=$(pwd)
 	current_dir=$(basename $AD)
@@ -340,6 +348,12 @@ function install_media {
 	mediaFiles=$(find ../media -name '*.*')
 	mediaDir=/var/lib/asterisk/sounds
 	mediaStatus=true
+
+	# make a backup of the sounds media directory if specified 
+	if [ $backup == "true" ]; then
+		make_backup $mediaDir
+	fi
+
 	echo "============================================================"
 	for file in $mediaFiles
 	do
@@ -361,6 +375,9 @@ function install_media {
 }
 
 function install_configs {
+	# backup var passed in as arg 1
+	backup=$1
+	
 	# check that we are in the proper directory 
 	AD=$(pwd)
 	current_dir=$(basename $AD)
@@ -400,6 +417,11 @@ function install_configs {
 	# TODO: Doing this manually for now, maybe we can make this dynamic?
 	cp odbc.ini.sample /etc/odbc.ini
 	print_message "Notify" "copied odbc.ini.sample ---> /etc/odbc.ini"
+
+	# make a backup of the configuration files if desired
+	if [ $backup == "true" ]; then
+		make_backup "/etc/asterisk"
+	fi
 
 	# status for user info
 	configStatus=true
@@ -461,6 +483,24 @@ function install_configs {
 		print_message "Error" "failed to install configuration files"
 	fi
 }	
+
+function make_backup {
+        # this method should work with full file paths and not relative ones
+        # the only input argument will be the directpry you wish to backup
+        # thus a directory will have to be created within it to store all the files
+        parent_dir=$(dirname $1)
+	dir=$(basename $1)
+        backup_dir="${parent_dir}/${dir}_backup"
+        if [ ! -d $backup_dir ]; then
+                mkdir $backup_dir
+		print_message "Notify" "Creating backup directory ${backup_dir}"
+        else
+                rm -rf "$backup_dir/*"
+		print_message "Notify" "Deleting contents of ${backup_dir}"
+        fi
+        # copy the files into backup
+        cp -rf $1 $backup_dir
+}
 
 function execute_args {
 	# restart asterisk so the changes are in effect
