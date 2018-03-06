@@ -34,7 +34,7 @@ There is a CSV file in this directory called .config.sample, which serves as a p
 Before executing the install script, you MUST modify this file with the values for your environment, then change the name of the script to .config. Below is a list of each current parameter in the config file:
 
 |    Tag              |              Usage                                                                  |
-|---------------------|-------------------------------------------------------------------------------------|
+|--------------------:|------------------------------------------------------------------------------------:|
 | <hostname>          | The domain name associated with the server.                                         |
 | <local_ip>          | The private/local IP address of the Asterisk.                                       |
 | <public_ip>         | The external.public IP address of the Asterisk server.                              |
