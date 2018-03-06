@@ -12,10 +12,9 @@ The Asterisk for ACE Direct configuration assumes the following:
 
 ## Automation
 
-Within the 'scripts' directory, there is a bash script that will automate the installation of PJSIP and Asterisk, as well as 
-pull down the configs and media files from this repo and move them into their appropriate locations.  View the README in the 'scripts'
-directory for more information. It is HIGHLY recommended to use the install and update scripts to manage Asterisk for ACE Direct, as manual installations
-are officially unsupported by the ACE Direct project.
+Within the 'scripts' directory, there are scripts that will automate the installation of PJSIP and Asterisk, as well as 
+pull down the configuration and media files from this repository and move them into their appropriate locations.  View the README in the 'scripts'
+directory for more information. It is HIGHLY recommended to use the install and update scripts to manage Asterisk for ACE Direct, as manual installations are officially unsupported by the ACE Direct project.
 
 
 ## Modules
