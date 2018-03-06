@@ -50,18 +50,6 @@ Before executing the install script, you MUST modify this file with the values f
 
 You can configure Twilio for use with Asterisk to route PSTN (i.e. non-VRS) calls to/from Asterisk. the extensions.conf and pjsip.conf files have configurations set for use with Twilio; however, they will not work unless you replace the <twilio_URI> placeholder in pjsip.conf with the Twilio termination URI of your SIP trunk. If it is not desired to use Twilio with ACE Direct, simply delete the sections of the dial-plan and SIP config that pertain to Asterisk. For more information on using Twilio with Asterisk, [download the Twilio docs](https://www.twilio.com/docs/documents/35/AsteriskTwilioSIPTrunkingv2_1.pdf).
 
-## Identity Management
-
-The pjsip.conf file defines user profiles that can be used to register to Asterisk. Each user profile has a password associated with it.
-Before starting and using Asterisk, IT IS HIGHLY RECOMMENDED to change the passwords fo each user account that will be used, as well as removing the ones that won't be used. Each password attribute currently has the placeholder <password> set in it. This is not recommended,
-however if you'd like each profile to have the same password you can execute the following:
-
-```sh
-
-$ sed -i -e 's/<password>/<the password you choose>/g' pjsip.conf
-
-```
-
 
 --------------------------------------------
 
@@ -75,7 +63,7 @@ $ sed -i -e 's/<password>/<the password you choose>/g' pjsip.conf
 ## Asterisk Database Initialization 
 * Each time this update script is run, it will check that the Asterisk service is running. 
 If it is not, the installation will be canceled. 
-* However, if the __--no-db__ is used, then this service check will not be performed and the Asterisk internal 
+* However, if the __--no-db__ flag is used, then this service check will not be performed and the Asterisk internal 
 database will not be checked for the following values : (GLOBAL DIALIN, BUSINESS_HOURS START, BUSINESS_HOURS END, BUSINESS_HOURS ACTIVE). 
 * If any of these values are missing in the DB, the user will be prompted for information.
 * If the entered value is not accepted, then the user will be re-prompted. 
@@ -121,9 +109,20 @@ the project after applying the patches.
 ## Example usage
 
 ```sh
-$ ./update_asterisk.sh --version 15.1.2 --patch --config --dialin 7032935641 --media --restart --cli
+$ ./update_asterisk.sh --version 15.1.2 --patch --config --dialin 7032935641 --media --backup --restart --cli
 
 ```
 * The example above will look for the asterisk-15.1.2 repository so that it can apply the patch files then rebuild
-the source. Afterwards, it will handle the replacement of the configuration files, set the dialin value in the Asterisk 
+the source. Afterwards, it will handle the replacement of the configuration files and media files after creating backups of each directory, set the dialin value in the Asterisk 
 database to 7032935641, restart, and launch the Asterisk CLI.
+
+## Build PJPROJECT
+The purpose of this script is to rebuild the Asterisk source code with a custom version of PJSIP which implements a patch that removes the REFER method 
+from the Allow Header for outbound SIP/SDP INVITES. To do this, the script accomplishes the following:
+* The correct version of PJPROJECT is pulled down from the Asterisk third-party repository.
+* This is then uncompressed and the patch to sip_inv.c (found in patches/pjproject/2.6/) is applied. 
+* This source code is then packeaged back into a .bz2 file and placed within an external-cache folder in /usr/src.
+* This directory must also contain the md5 file for the .bz2 source code in order for it to be verified during the Asterisk configure process.  
+* Once these two files have been provisioned, Asterisk can be configured with the --with-externals-cache flag pointing to to our two new resources in /usr/src/external-cache
+* Asterisk is then built as usual and restarted to complete the installation process.
+ 
