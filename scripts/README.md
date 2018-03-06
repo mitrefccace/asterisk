@@ -1,6 +1,6 @@
 # **Asterisk for ACE Direct Installation script**
 
-The AD_asterisk_install.sh script in this directory will automate the installation and configuration of Asterisk for ACE Direct. This script has been developed for use on a CentOS 7.3.x (and newer) server, and support for earlier versions are not guaranteed. It will perform the following:
+The AD_asterisk_install.sh script in this directory will automate the installation and configuration of Asterisk for ACE Direct. This script has been developed for use on a CentOS 7.3.x (and newer) server, and support for earlier versions is not guaranteed. It will perform the following:
 
 * Checks for SElinux and IPv6. Script fails if either are detected
 * Include default parameters for STUN server, dial-in, and SSL certs if none are provided
@@ -21,6 +21,7 @@ The Asterisk for ACE Direct configuration assumes the following:
 * A "dial-in" number which has been registered in iTRS and/or a SIP trunk provider (such as Twilio) (optional)
 * An SSL cert file, acquired from a trusted certificate authority, for the domain of your server. This is necessary for WebRTC functionality as major browsers will drop connections to the Asterisk server if it's cert is not trusted.
 
+--------------------------------------------
 
 ## Configuration
 
@@ -32,19 +33,23 @@ There is a CSV file in this directory called .config.sample, which serves as a p
 
 Before executing the install script, you MUST modify this file with the values for your environment, then change the name of the script to .config. Below is a list of each current parameter in the config file:
 
-* <hostname>: The domain name associated with the server
-* <local_ip>: The private/local IP address of the Asterisk
-* <public_ip>: The external.public IP address of the Asterisk server
-* <stun_server>: STUN/TURN server address:port. We recommend building a dedicated STUN server, as public STUN servers can become congested and lead to higher latency for STUN/ICE. If you do not have one, a Google STUN server will be used in the config instead.
-* <crt_file>: CA cert file for server. Generated self-signed cert is used if none is provided.
-* <crt_key>: Private key for CA cert
-* <cdr_host>: URI for the MySQL database
-* <cdr_db>: The name of the database to use
-* <cdr_table>: MySQL Table name used for CDR
-* <cdr_user> : MySQL username used by Asterisk to write CDR records
-* <cdr_pass>: Password for above MySQL username
+|    Tag              |              Usage                                                                  |
+|---------------------|-------------------------------------------------------------------------------------|
+| <hostname>          | The domain name associated with the server.                                         |
+| <local_ip>          | The private/local IP address of the Asterisk.                                       |
+| <public_ip>         | The external.public IP address of the Asterisk server.                              |
+| <stun_server>       | STUN/TURN server address:port. We recommend building a dedicated STUN server, as public STUN servers can become congested and lead to higher latency for STUN/ICE. If you do not have one, a Google STUN server will be used in the config instead.|                                  
+| <crt_file>          | CA cert file for server. Generated self-signed cert is used if none is provided.    |
+| <crt_key>           | Private key for CA cert.                                                            |
+| <cdr_host>          | URI for the MySQL database.                                                         |
+| <cdr_db>            | The name of the database to use.                                                    |
+| <cdr_table>         | MySQL Table name used for CDR.                                                      |
+| <cdr_user>          | MySQL username used by Asterisk to write CDR records.                               |
+| <cdr_pass>          | Password for above MySQL username.                                                  |
 
 (Note: the OS will need additional configurations to enable Asterisk to connect to MySQL. See the docs directory in the main ACE Direct repo for more info.)
+
+--------------------------------------------
 
 ## Twilio
 
@@ -69,9 +74,9 @@ database will not be checked for the following values : (GLOBAL DIALIN, BUSINESS
 * If the entered value is not accepted, then the user will be re-prompted. 
 * If the dialin flag is specified, then the DB value for this field will be modified. 
 ## Media files
-#### Process
 * If the __--media__ file flag is used as an argument, then all of the media files within this repository 
 will be copied into /var/lib/asterisk/sounds.
+
 ## Configuration files
 ##### .config
 * This is a comma separated value file which contains file modification instructions
@@ -116,12 +121,14 @@ $ ./update_asterisk.sh --version 15.1.2 --patch --config --dialin 7032935641 --m
 the source. Afterwards, it will handle the replacement of the configuration files and media files after creating backups of each directory, set the dialin value in the Asterisk 
 database to 7032935641, restart, and launch the Asterisk CLI.
 
+--------------------------------------------
+
 ## Build PJPROJECT
 The purpose of this script is to rebuild the Asterisk source code with a custom version of PJSIP which implements a patch that removes the REFER method 
 from the Allow Header for outbound SIP/SDP INVITES. To do this, the script accomplishes the following:
 * The correct version of PJPROJECT is pulled down from the Asterisk third-party repository.
 * This is then uncompressed and the patch to sip_inv.c (found in patches/pjproject/2.6/) is applied. 
-* This source code is then packeaged back into a .bz2 file and placed within an external-cache folder in /usr/src.
+* This source code is then packaged back into a .bz2 file and placed within an external-cache folder in /usr/src.
 * This directory must also contain the md5 file for the .bz2 source code in order for it to be verified during the Asterisk configure process.  
 * Once these two files have been provisioned, Asterisk can be configured with the --with-externals-cache flag pointing to to our two new resources in /usr/src/external-cache
 * Asterisk is then built as usual and restarted to complete the installation process.
