@@ -21,13 +21,33 @@ class CornerCases(unittest.TestCase):
 		
 	@classmethod
 	def setUpClass(cls):
-		# move into scripts dir
-		os.chdir('../')
-		# temporarily change the .config.sample file name
-		os.rename('./.config.sample', './.config')
+		try:
+			# move into scripts dir
+			os.chdir('../')
+			
+			# temporarily change the .config.sample file name
+			configFound = False
+			for root, dirs, files in os.walk('.'):  
+				for fileName in files:
+					if fileName == '.config.sample':
+						os.rename('.config.sample', '.config')
+						configFound = True
+						break	
+					elif fileName == '.config':
+						configFound = True
+						break
+			if not configFound:
+				print('Could not find the .config file in the parent directory ---> Aborting Test')
+				sys.exit(-1)
+		except:
+			print('Error occurred while setting up the test class ---> Aborting Test')
+			sys.exit(-1)
 	
 	def test_ast_service_down(self):
-       		# stop asterisk service
+       		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Service Running?')
+
+		# stop asterisk service
 		com = Commands.OsCommand('sudo service asterisk stop')
 		rez = com.execute(1)
        	
@@ -42,13 +62,19 @@ class CornerCases(unittest.TestCase):
 		rez = com.execute(1)
        
 	def test_bad_input(self):
-       		# check for unrecognized command line args
+       		# alert the user of the current test
+		print ('\nTesting ---> Bad Input')
+
+		# check for unrecognized command line args
 		com = Commands.OsCommand('sudo ./update_asterisk.sh --config patch ---no-db')
 		rez = com.execute(0)
 		correct = "\x1b[31mError -- \x1b(B\x1b[munkown argument: try running './update_asterisk.sh --help' for more information  ---> exiting program\n"
 		self.assertEqual(rez, correct)
        
 	def test_config_install(self):
+		# alert the user of the current test
+		print ('\nTesting --->Configuration Successfull?')
+
        		# check the entire configuration process for successs
 		com = Commands.OsCommand('sudo ./update_asterisk.sh --config')
 		rez = com.execute(0)
@@ -60,6 +86,9 @@ class CornerCases(unittest.TestCase):
 		self.assertEqual(status, correct)
 	
 	def test_no_dialin_no_db(self):
+		# alert the user of the current test
+		print ('\nTesting ---> No Dialin with No DB')
+
 		# get the old number 
 		com = Commands.AstCommand('database get GLOBAL DIALIN')
 		rez = com.execute(0)
@@ -87,11 +116,15 @@ class CornerCases(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		# change the config file name back
-		os.rename('./.config', './.config.sample')
-		os.chdir('./unit-tests')
+		try:
+			# change the config file name back
+			os.rename('./.config', './.config.sample')
+			os.chdir('./unit-tests')
+		except:
+			print('Error occurred during class teardown')
+			sys.exit(-1)
 
-	
+
 if __name__ == '__main__':
 	sys.exit(unittest.main())
 
