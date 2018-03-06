@@ -19,31 +19,38 @@ class AsteriskTests(unittest.TestCase):
 		
 	@classmethod
 	def setUpClass(cls):
-		# load some values from JSON configuration 
-		cls.configFile = "./asterisk_test_config.json"
-		with open(cls.configFile, 'r') as f:
-			cls.configs = json.load(f)
-		
-		# move into scripts dir
-		os.chdir('../')
-		
-		# temporarily change the .config.sample file name
-		configFound = False
-		for root, dirs, files in os.walk('.'):  
-			for fileName in files:
-				if fileName == '.config.sample':
-					os.rename('.config.sample', '.config')
-					configFound = True
-					break	
-				elif fileName == '.config':
-					configFound = True
-					break
-		if not configFound:
-			print('Could not find the .config file in the parent directory ---> Aborting Test')
+		try:
+			# load some values from JSON configuration 
+			cls.configFile = './asterisk_test_config.json'
+			with open(cls.configFile, 'r') as f:
+				cls.configs = json.load(f)
+			
+			# move into scripts dir
+			os.chdir('../')
+			
+			# temporarily change the .config.sample file name
+			configFound = False
+			for root, dirs, files in os.walk('.'):  
+				for fileName in files:
+					if fileName == '.config.sample':
+						os.rename('.config.sample', '.config')
+						configFound = True
+						break	
+					elif fileName == '.config':
+						configFound = True
+						break
+			if not configFound:
+				print('Could not find the .config file in the parent directory ---> Aborting Test')
+				sys.exit(-1)
+		except:
+			print('Error occured while setting up the test class ---> Aborting Test')
 			sys.exit(-1)
 
 	def test_ast_service_down(self):
-       		# stop asterisk service
+       		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Service Down?')
+
+		# stop asterisk service
 		com = Commands.OsCommand('sudo service asterisk stop')
 		rez = com.execute(1)
        	
@@ -58,6 +65,9 @@ class AsteriskTests(unittest.TestCase):
 		rez = com.execute(1)
 	
 	def test_pjsip_endpoints(self):
+		# alert the user of the current test
+		print ('\nTesting ---> PJSIP Endpoints Loaded?')
+		
 		com = Commands.AstCommand('pjsip show endpoints')
 		rez = com.execute(0)
 		lines = rez.split('\n')
@@ -68,6 +78,9 @@ class AsteriskTests(unittest.TestCase):
 		self.assertGreater(numEndpoints, 0)
 	
 	def test_db_entries(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Database Entries?')
+		
 		com = Commands.AstCommand('database show')
 		rez = com.execute(0)
 		lines = rez.split('\n')
@@ -78,6 +91,9 @@ class AsteriskTests(unittest.TestCase):
 		self.assertGreater(numEntries, 0)		
 
 	def test_cdr_db(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Connected to CDR DB?')
+		
 		com = Commands.AstCommand('cdr show status')
 		rez = com.execute(0)
 		lines = rez.split('\n')
@@ -91,6 +107,9 @@ class AsteriskTests(unittest.TestCase):
 		self.assertEqual(status, "Enabled")
 			
 	def test_stun_server(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk STUN Server?')
+	
 		com = Commands.AstCommand('stun show status')
 		rez = com.execute(0)
 		lines = rez.split('\n')
@@ -101,6 +120,9 @@ class AsteriskTests(unittest.TestCase):
 		self.assertEqual(stun, self.configs["asterisk"]["stun"])		
 
 	def test_queues(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Queue Number Non-Zero?')
+
 		com = Commands.AstCommand('queue show')
 		rez = com.execute(0)
 		# sometimes the queue show returns 'No such command' so loop to get proper resp
@@ -117,11 +139,15 @@ class AsteriskTests(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		# change the config file name back
-		os.rename('./.config', './.config.sample')
-		os.chdir('./unit-tests')
-
+		try:
+			# change the config file name back
+			os.rename('./.config', './.config.sample')
+			os.chdir('./unit-tests')
+		except:
+			print('Error occured during class teardown')
+			sys.exit(-1)
 		
+
 if __name__ == '__main__':
 	sys.exit(unittest.main())
 

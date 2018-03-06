@@ -17,9 +17,6 @@ pull down the configs and media files from this repo and move them into their ap
 directory for more information. It is HIGHLY recommended to use the install and update scripts to manage Asterisk for ACE Direct, as manual installations
 are officially unsupported by the ACE Direct project.
 
-## Download/Configure
-
-Please follow the automated installation instructions which have been outlined and exaplined within the scripts/ directory.
 
 ## Modules
 
