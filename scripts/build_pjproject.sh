@@ -63,6 +63,9 @@ sleep 1
 
 # rename dir to pjproject-2.6.1 && apply the included patch
 mv "${instLoc}custom-build/pjproject-${pjVersion}" "${instLoc}custom-build/pjproject-${pjCustom}"
+
+# change the ownership of the directory to root
+chown -R root:root "${instLoc}custom-build/" 
  
 # add the included header file in /usr/src/pjproject-2.6.1/pjsip/include/pjsip-ua/
 print_message "Notify" "adding sip_config.h to pjproject"
