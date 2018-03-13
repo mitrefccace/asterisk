@@ -386,15 +386,6 @@ function install_configs {
 		exit 1
 	fi
 	
-	# check for the hostname
-	hostName=$(hostname)
-	if [[ $hostName == "" ]]; then 
-		# get the hostname from the user
-		printf "Please enter the domain name for this server: "
-		read hostName
-	fi
-	error_check_domain $hostName
-	
 	# alert user of the asterisk dialin number
 	dialin=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
 	rez=$(error_check_num $dialin)
@@ -404,14 +395,6 @@ function install_configs {
 		print_message "Error" "the Asterisk database does not contain a dialin number ---> Installation Canceled"
 		exit 1
 	fi
-	# alert user of th global address
-	globalIP=$(dig +short ${hostName})
-	print_message "Notify" "this machine's global IP has been detected ---> ${globalIP}"
-	
-	# alert the user of the local IP
-	# WARNING -- the following line could pose a problem to 'dual-homes' networks
-	localIP=$(ifconfig | grep inet -m 1 | cut -d ' ' -f 10)
-	print_message "Notify" "this machine's local IP has been detected ---> ${localIP}"
 	
 	# move odbc.ini.sample to /etc. 
 	# TODO: Doing this manually for now, maybe we can make this dynamic?
