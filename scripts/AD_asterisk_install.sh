@@ -156,11 +156,8 @@ sleep 2
 #generate TIS certificates
 /usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 
-# pull down confi/media files and add to /etc/asterisk and /var/lib/asterisk/sounds, respectively
 repo=$(dirname $startPath)
 cd $repo
-yes | cp -rf config/* /etc/asterisk
-yes | cp -rf media/* /var/lib/asterisk/sounds/
 
 #copy iTRS lookup script to agi-bin and make it executable
 yes | cp -rf scripts/itrslookup.sh /var/lib/asterisk/agi-bin
