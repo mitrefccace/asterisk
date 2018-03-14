@@ -12,7 +12,7 @@ PUBLIC_IP=''
 GOOGLE='stun4.l.google.com:19302'
 
 #Asterisk version
-AST_VERSION=15.1.2
+AST_VERSION="15.3.0-rc1"
 
 # Config file
 INPUT=.config
@@ -156,11 +156,8 @@ sleep 2
 #generate TIS certificates
 /usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 
-# pull down confi/media files and add to /etc/asterisk and /var/lib/asterisk/sounds, respectively
 repo=$(dirname $startPath)
 cd $repo
-yes | cp -rf config/* /etc/asterisk
-yes | cp -rf media/* /var/lib/asterisk/sounds/
 
 #copy iTRS lookup script to agi-bin and make it executable
 yes | cp -rf scripts/itrslookup.sh /var/lib/asterisk/agi-bin
@@ -169,7 +166,7 @@ chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 #modify configs with named params and populate AstDB
 
 cd $startPath
-./update_asterisk.sh --config --restart
+./update_asterisk.sh --config --media --restart
 
 echo ""
 echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"
