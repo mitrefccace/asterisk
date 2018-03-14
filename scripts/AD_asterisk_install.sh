@@ -166,7 +166,7 @@ chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 #modify configs with named params and populate AstDB
 
 cd $startPath
-./update_asterisk.sh --config --restart
+./update_asterisk.sh --config --media --restart
 
 echo ""
 echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"
