@@ -71,23 +71,11 @@ function error_check_args {
 	media=false
 	restartArg=false
         cliArg=false
-	nextIsNum=false
-	nextIsVersion=false
         phoneNum=""	
 	version=""
 
 	for arg in $@
         do
-		if [[ $nextIsNum == "true" ]]; then
-			phoneNum=$arg
-			nextIsNum=false
-			continue
-		elif [[ $nextIsVersion == "true" ]]; then
-			version=$arg
-			nextIsVersion=false
-			continue
-		fi
-		
 		case $arg in
                         --help)
                                 show_instructions
@@ -109,8 +97,10 @@ function error_check_args {
 				media=true
 				;;
 			--version)
-				nextIsVersion=true
-				;;
+				case $2 in
+					"") print_message "Error" "--version flag must be followed by a version number" exit 1 ;;
+					*) version=$2; shift 2 ;;
+				esac ;;
 			--no-build)
 				build=false
 				;;
@@ -121,8 +111,10 @@ function error_check_args {
                                 cliArg=true
                                 ;;
 			--dialin)
-				nextIsNum=true
-				;;
+				case $2 in
+					"") print_message "Error" "--dialin flag must be followed by a version number" exit 1 ;;
+					*) phoneNum=$2; shift 2 ;;
+				esac ;;
                         *)
                                 print_message "Error" "unkown argument: try running './update_asterisk.sh --help' for more information  ---> exiting program"
                                 exit 1
