@@ -33,11 +33,12 @@ function error_check_args {
 	clean=false
 	astVersion="15.3.0-rc1"
 	pjVersion="2.7.1"
-	
-	while true
+	done=false
+
+	while [ !done ]
 	do
 
-		case $1 in
+		case "$1" in
 			--help)
 				show_instructions
 				exit 0
@@ -46,28 +47,33 @@ function error_check_args {
 				build=false
 				;;
 			--ast-version)
-				case $2 in
+				case "$2" in
 					"") print_message "Error" "--ast-version flag must include a value" 
+						exit 1;;
+					# We need to add this case in the event that $2 is another flag
+					--*) print_message "Error" "--ast-version flag must include a value"
 						exit 1;;
 					*) astVersion=$2; shift 2 ;;
 				esac ;;
 			--pj-version)
-				case $2 in
+				case "$2" in
 					"") print_message "Error" "--pj-version flag must include a value" 
+						exit 1;;
+					--*) print_message "Error" "--pj-version flag must include a value"
 						exit 1;;
 					*) pjVersion=$2; shift 2 ;;
 				esac ;;
 			--clean)
 				clean=true
 				;;
-			--) shift ; break ;;
+			--) done=true; break ;;
 			*)
 				print_message "Error" "unkown argument: try running './build_pjproject.sh --help' for more information  ---> exiting program"
 				exit 1
 		esac
 	done
 
-	# call the ain function
+	# notify user of params to be used, then call the main function
 	print_message "Notify" "running build_pjproject.sh with the following  values:"
 	echo "-----------------------------------" 
 	echo "Asterisk Version   :  ${astVersion}"
