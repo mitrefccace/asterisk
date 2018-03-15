@@ -18,7 +18,7 @@
 astVersion="15.3.0-rc1"
 pjVersion="2.7.1"
 removeArtifacts="true"
-buildAst="false"
+buildAst="true"
 #############################################
  
 # note our current dir location
