@@ -30,9 +30,7 @@ function show_instructions {
 function error_check_args {
 	# vars
 	build=true
-	next_is_ast=false
 	clean=false
-	next_is_pj=false
 	astVersion="15.3.0-rc1"
 	pjVersion="2.7.1"
 	
@@ -57,11 +55,16 @@ function error_check_args {
 				build=false
 				;;
 			--ast-version)
-				next_is_ast=true
-				;;
+				case $2 in
+					"") print_message "Error" "--ast-version flag must include a value" 
+						exit 1;;
+					*) astVersion=$2; shift 2 ;;
+				esac ;;
 			--pj-version)
-				next_is_pj=true
-				;;
+				case $2 in
+					"") print_message "Error" "--pj-version flag must include a value" ;;
+					*) pjVersion=$2; shift 2 ;;
+				esac ;;
 			--clean)
 				clean=true
 				;;
