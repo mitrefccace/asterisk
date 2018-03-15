@@ -17,6 +17,8 @@
 ##############################################
 astVersion="15.3.0-rc1"
 pjVersion="2.7.1"
+removeArtifacts="true"
+buildAst="false"
 #############################################
  
 # note our current dir location
@@ -99,18 +101,47 @@ print_message "Notify" "setting custom pjproject build version to ${pjCustom}"
 sed -i "s/PJPROJECT_VERSION = *.*/PJPROJECT_VERSION = ${pjCustom}/g" "${astPath}/third-party/versions.mak"
 
 # build
-./configure --with-externals-cache="${instLoc}external-cache"
-make 
-make install
-if [[ $? == "0" ]];then
-	print_message "Success" "Asterisk ${astVersion} built successfully with custom pjproject version ${pjCustom}"
-	make config
-	ldconfig
-	# clean up
-	cd $startPath
-	rm -rf ./third-party
-else
-	print_message "Error" "failed to install Asterisk-${astVersion} with pjproject ${pjCustom}"
+if [ $buildAst == "true" ]; then
+	./configure --with-externals-cache="${instLoc}external-cache"
+	make 
+	make install
+	if [[ $? == "0" ]];then
+		print_message "Success" "Asterisk ${astVersion} built successfully with custom pjproject version ${pjCustom}"
+		make config
+		ldconfig
+		
+	else
+		print_message "Error" "failed to install Asterisk-${astVersion} with pjproject ${pjCustom}"
+	fi
+fi
+
+# delete some of the build artiifacts
+cd $startPath
+if [ $removeArtifacts == "true" ]; then
+	if [ -d "./third-party" ]; then 
+		rm -rf "./third-party"
+		if [ $? == "0" ]; then
+			print_message "Success" "deleted ${startPath}/third-party"
+		else
+			print_message "Error" "failed to delete ${startPath}/third-party"
+		fi
+	fi
+	if [ -d "${instLoc}custom-build" ]; then
+		rm -rf "${instLoc}custom-build"
+		if [ $? == "0" ]; then
+			print_message "Success" "deleted aritifact ${instLoc}custom-build"
+		else
+			print_message "Error" "failed to delete ${instLoc}custom-build"
+		fi
+	fi
+	if [ -d "${instLoc}external-cache" ]; then
+		rm -rf "${instLoc}external-cache"
+		if [ $? == "0" ]; then
+			print_message "Success" "deleted aritifact ${instLoc}external-cache"
+		else
+			print_message "Error" "failed to delete ${instLoc}external-cache"
+		fi
+	fi
 fi
 
 # restart the Asterisk instance
