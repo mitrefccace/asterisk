@@ -36,15 +36,6 @@ function error_check_args {
 	
 	for arg in $@
 	do
-		if [ $next_is_ast == "true" ]; then
-			astVersion=$arg
-			next_is_ast=false
-			continue
-		elif [ $next_is_pj == "true" ]; then
-			pjVersion=$arg
-			next_is_pj=false
-			continue
-		fi
 
 		case $arg in
 			--help)
@@ -62,7 +53,8 @@ function error_check_args {
 				esac ;;
 			--pj-version)
 				case $2 in
-					"") print_message "Error" "--pj-version flag must include a value" ;;
+					"") print_message "Error" "--pj-version flag must include a value" 
+						exit 1;;
 					*) pjVersion=$2; shift 2 ;;
 				esac ;;
 			--clean)
