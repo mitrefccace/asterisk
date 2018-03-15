@@ -59,17 +59,17 @@ if [ ! -d "${instLoc}custom-build" ]; then
 	mkdir "${instLoc}custom-build"
 fi
 
-# untar the version 2.6 project to /usr/src
+# untar pjproject to /usr/src
 tar -xvjf ./third-party/pjproject/${pjVersion}/"pjproject-${pjVersion}.tar.bz2" -C "${instLoc}custom-build"
 sleep 1
 
-# rename dir to pjproject-2.6.1 && apply the included patch
+# rename dir to pjproject-${pjVersion} && apply the included patch
 mv "${instLoc}custom-build/pjproject-${pjVersion}" "${instLoc}custom-build/pjproject-${pjCustom}"
 
 # change the ownership of the directory to root
 chown -R root:root "${instLoc}custom-build/" 
  
-# add the included header file in /usr/src/pjproject-2.6.1/pjsip/include/pjsip-ua/
+# add the included header file in /usr/src/pjproject-${pjVersion}/pjsip/include/pjsip-ua/
 print_message "Notify" "adding sip_config.h to pjproject"
 cp "${currDir}/include/pjproject/sip_config.h" "${instLoc}custom-build/pjproject-${pjCustom}/pjsip/include/pjsip-ua/"
 
@@ -83,7 +83,7 @@ if [ ! -d "${instLoc}external-cache" ]; then
 	mkdir "${instLoc}external-cache"
 fi
 
-# create the new tarball from 2.6.1
+# create the new tarball from ${pjVersion}
 cd "${instLoc}custom-build"
 tar -cjvf "pjproject-${pjCustom}.tar.bz2" "./pjproject-${pjCustom}" 
 mv "pjproject-${pjCustom}.tar.bz2" "${instLoc}external-cache"
@@ -92,11 +92,11 @@ mv "pjproject-${pjCustom}.tar.bz2" "${instLoc}external-cache"
 cd "${instLoc}external-cache"
 md5sum "pjproject-${pjCustom}.tar.bz2" > "pjproject-${pjCustom}.md5"
 
-# move into asterisk 15.1.2 
+# move into asterisk-${astVersion}
 astPath=$(find / -type d -name "asterisk-${astVersion}")
 cd $astPath
 
-# change the asterisk-15.1.2/third-party/versions.mak to 2.6.1
+# change the asterisk-${astVersion}/third-party/versions.mak to ${pjVersion}
 print_message "Notify" "setting custom pjproject build version to ${pjCustom}"
 sed -i "s/PJPROJECT_VERSION = *.*/PJPROJECT_VERSION = ${pjCustom}/g" "${astPath}/third-party/versions.mak"
 
