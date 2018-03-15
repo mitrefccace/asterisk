@@ -34,10 +34,10 @@ function error_check_args {
 	astVersion="15.3.0-rc1"
 	pjVersion="2.7.1"
 	
-	for arg in $@
+	while true
 	do
 
-		case $arg in
+		case $1 in
 			--help)
 				show_instructions
 				exit 0
