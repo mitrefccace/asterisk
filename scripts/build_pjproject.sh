@@ -83,7 +83,7 @@ function error_check_args {
 	echo "Rebuild Asterisk   :  ${build}"
 	echo "Remove Artifacts   :  ${clean}"
 	echo "-----------------------------------"
-	#main $astVersion $pjVersion $build $clean
+	main $astVersion $pjVersion $build $clean
 }
 
 
