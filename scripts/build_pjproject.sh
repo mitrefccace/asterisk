@@ -19,8 +19,8 @@ function show_instructions {
                 echo "+ ./update_asterisk.sh [Optional_Flags]                                                           +"
                 echo "+                                                                                                 +"
                 echo "+            --help        : Optional : Displays these program instructions                       +"
-                echo "+            --no-build    : Optional : Opts not to build the Asterisk source code                +"
-                echo "+            --ast-version : Optional : Specifies the next arg is the version of Asterisk         +"
+		echo "+            --no-build    : Optional : Opts not to build the Asterisk source code                +"
+		echo "+            --ast-version : Optional : Specifies the next arg is the version of Asterisk         +"
 		echo "+            --pj-version  : Optional : Specifies the next arg is the version of PJ-Project       +"		
 		echo "+            --clean       : Optional : Removes build artifacts and directories                   +"
                 echo "+-------------------------------------------------------------------------------------------------+"
@@ -36,15 +36,6 @@ function error_check_args {
 	astVersion="15.3.0-rc1"
 	pjVersion="2.7.1"
 	
-	#  handle no arguments
-        if [[ $@ == "" ]]; then
-                print_message "Notify" :"running build_pjproject.sh with the following default values:\n"
-                echo "Asterisk Version   :  ${astVersion}"
-		echo "PJ-Project Version :  ${pjVersion}"
-		echo "Rebuild Asterisk   :  ${build}"
-		echo "Remove Artifacts   :  ${cleanup}"
-        fi
-
 	for arg in $@
 	do
 		if [ $next_is_ast == "true" ]; then
@@ -81,6 +72,13 @@ function error_check_args {
 	done
 
 	# call the ain function
+	print_message "Notify" "running build_pjproject.sh with the following  values:"
+	echo "-----------------------------------" 
+	echo "Asterisk Version   :  ${astVersion}"
+	echo "PJ-Project Version :  ${pjVersion}"
+	echo "Rebuild Asterisk   :  ${build}"
+	echo "Remove Artifacts   :  ${clean}"
+	echo "-----------------------------------"
 	main $astVersion $pjVersion $build $clean
 }
 
@@ -173,9 +171,9 @@ function main {
 
 	# build
 	if [ $buildAst == "true" ]; then
-		#./configure --with-externals-cache="${instLoc}external-cache"
-		#make 
-		#make install
+		./configure --with-externals-cache="${instLoc}external-cache"
+		make 
+		make install
 		if [[ $? == "0" ]];then
 			print_message "Success" "Asterisk ${astVersion} built successfully with custom pjproject version ${pjCustom}"
 			make config
