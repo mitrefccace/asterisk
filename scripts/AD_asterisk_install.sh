@@ -144,7 +144,7 @@ sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 cd $startPath
 # Apply custom Asterisk patches, then apply custom PJPROJECT patch and install PJ and Asterisk
 ./update_asterisk.sh --patch --no-build --no-db
-./build_pjproject.sh
+./build_pjproject.sh --clean
 
 #run ldconfig so that Asterisk finds PJPROJECT packages
 echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
