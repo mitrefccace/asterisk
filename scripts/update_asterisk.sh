@@ -71,64 +71,86 @@ function error_check_args {
 	media=false
 	restartArg=false
         cliArg=false
-	nextIsNum=false
-	nextIsVersion=false
         phoneNum=""	
 	version=""
+	done= false
 
-	for arg in $@
+	while [ !done ]
         do
-		if [[ $nextIsNum == "true" ]]; then
-			phoneNum=$arg
-			nextIsNum=false
-			continue
-		elif [[ $nextIsVersion == "true" ]]; then
-			version=$arg
-			nextIsVersion=false
-			continue
-		fi
-		
-		case $arg in
+		case "$1" in
                         --help)
                                 show_instructions
                                 exit 0
                                 ;;
                         --patch)
 				patch=true
+				shift
 				;;
 			--config)
 				config=true
+				shift
 				;;
 			--backup)
 				backup=true
+				shift
 				;;
 			--no-db)
 				db=false
+				shift
 				;;
 			--media)
 				media=true
+				shift
 				;;
 			--version)
-				nextIsVersion=true
-				;;
+				case "$2" in
+					"") print_message "Error" "--version flag must be followed by a version number" 
+					    exit 1 ;;
+					--*) print_message "Error" "--version flag must be followed by a version number"
+					     exit 1 ;;
+					*) version=$2; shift 2 ;;
+				esac ;;
 			--no-build)
 				build=false
+				shift
 				;;
 			--restart)
                                 restartArg=true
+				shift
                                 ;;
                         --cli)
                                 cliArg=true
+				shift
                                 ;;
 			--dialin)
-				nextIsNum=true
-				;;
+				case "$2" in
+					"") print_message "Error" "dialin flag must be followed by a version number" 
+					    exit 1 ;;
+					--*) print_message "Error" "dialin flag must be followed by a version number"
+					     exit 1 ;;
+					*) phoneNum=$2; shift 2 ;;
+				esac ;;
+			"") done=true; break;;
                         *)
                                 print_message "Error" "unkown argument: try running './update_asterisk.sh --help' for more information  ---> exiting program"
                                 exit 1
                 esac
         done
-	
+
+	# print setting to user
+	echo "---------------------------------"
+	echo "patch    : ${patch}"
+	echo "config   : ${config}"
+	echo "media    : ${media}"
+	echo "backup   : ${backup}"
+	echo "no-db    : ${db}"
+	echo "version  : ${version}"
+	echo "no-build : ${build}"
+	echo "restart  : ${restartArg}"
+	echo "cli      : ${cliArg}"
+	echo "dialin   : ${phoneNum}"
+	echo "---------------------------------"
+
 	# check_ast_status, then initialize the 
 	# asterisk database with business hours
 	if [[ $db == "true" ]] || [[ $phoneNum != "" ]]; then
