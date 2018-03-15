@@ -49,18 +49,18 @@ function error_check_args {
 				;;
 			--ast-version)
 				case "$2" in
-					"") print_message "Error" "--ast-version flag must include a value" 
+					"") print_message "Error" "ast-version flag must include a value" 
 						exit 1;;
 					# We need to add this case in the event that $2 is another flag
-					--*) print_message "Error" "--ast-version flag must include a value"
+					--*) print_message "Error" "ast-version flag must include a value"
 						exit 1;;
 					*) astVersion=$2; shift 2 ;;
 				esac ;;
 			--pj-version)
 				case "$2" in
-					"") print_message "Error" "--pj-version flag must include a value" 
+					"") print_message "Error" "pj-version flag must include a value" 
 						exit 1;;
-					--*) print_message "Error" "--pj-version flag must include a value"
+					--*) print_message "Error" "pj-version flag must include a value"
 						exit 1;;
 					*) pjVersion=$2; shift 2 ;;
 				esac ;;
@@ -83,7 +83,7 @@ function error_check_args {
 	echo "Rebuild Asterisk   :  ${build}"
 	echo "Remove Artifacts   :  ${clean}"
 	echo "-----------------------------------"
-	main $astVersion $pjVersion $build $clean
+	#main $astVersion $pjVersion $build $clean
 }
 
 
