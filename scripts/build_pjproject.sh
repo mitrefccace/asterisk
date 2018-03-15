@@ -45,6 +45,7 @@ function error_check_args {
 				;;
 			--no-build)
 				build=false
+				shift
 				;;
 			--ast-version)
 				case "$2" in
@@ -65,8 +66,9 @@ function error_check_args {
 				esac ;;
 			--clean)
 				clean=true
+				shift
 				;;
-			"") done=true; break ;;
+			"") done=true; break;;
 			*)
 				print_message "Error" "unkown argument: try running './build_pjproject.sh --help' for more information  ---> exiting program"
 				exit 1
