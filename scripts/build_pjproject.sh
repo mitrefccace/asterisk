@@ -60,6 +60,7 @@ function error_check_args {
 			--clean)
 				clean=true
 				;;
+			--) shift ; break ;;
 			*)
 				print_message "Error" "unkown argument: try running './build_pjproject.sh --help' for more information  ---> exiting program"
 				exit 1
