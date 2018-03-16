@@ -126,8 +126,10 @@ class AsteriskTests(unittest.TestCase):
 		com = Commands.AstCommand('queue show')
 		rez = com.execute(0)
 		# sometimes the queue show returns 'No such command' so loop to get proper resp
-		while rez.split(' ')[0].strip() == 'No':
+		numTries = 3
+		while ((rez.split(' ')[0].strip() == 'No') and numTries):
 			rez = com.execute(0)
+			numTries = numTries-1
 		lines = rez.split('\n')
 		queues = []
 		for line in lines:
