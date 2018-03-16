@@ -466,6 +466,9 @@ function install_configs {
 				# this statement will evaluate to true
 				if [ $( dirname $file) != "." ]; then
 					sed -i 's|'$tag'|'$value'|g' "$file"
+					if [ $tag == "<cdr_pass>" ]; then
+						sed -i 's|'$tag'|'\&'|g' "$file"
+					fi
 				else
 					sed -i 's|'$tag'|'$value'|g' "/etc/asterisk/$file"
 				fi
