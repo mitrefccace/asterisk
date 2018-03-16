@@ -466,6 +466,10 @@ function install_configs {
 				# this statement will evaluate to true
 				if [ $( dirname $file) != "." ]; then
 					sed -i 's|'$tag'|'$value'|g' "$file"
+					# ***********************************************************
+					# this is a work-around to handle the '&' in the cdr password 
+					# if we change the pw then this logic should be adjusted 
+					# ***********************************************************
 					if [ $tag == "<cdr_pass>" ]; then
 						sed -i 's|'$tag'|'\&'|g' "$file"
 					fi
