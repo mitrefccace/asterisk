@@ -57,8 +57,12 @@ class AsteriskTests(unittest.TestCase):
        		# check the output of PAC
 		com = Commands.OsCommand('sudo ./update_asterisk.sh --config')
 		rez = com.execute(0)
-		correct = '\x1b[31mError -- \x1b(B\x1b[mAsterisk service is unreachable ---> Installation canceled\n'
-		self.assertEqual(rez, correct)
+		lines = rez.split('\n')
+		msg = lines.pop()
+		while msg is "":
+			msg = lines.pop()
+		correct = '\x1b[31mError -- \x1b(B\x1b[mAsterisk service is unreachable ---> Installation canceled'
+		self.assertEqual(msg, correct)
        	
 		# start the asterisk service back up
 		com = Commands.OsCommand('sudo service asterisk start')
