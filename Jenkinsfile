@@ -13,8 +13,6 @@ pipeline {
 		sh 'sed -i -e "s/192.168.0.1/$(hostname -I | awk {'print $1'})/g" .config.sample'
 		sh 'sed -i -e "s/8.8.8.8/$(hostname -I | awk {'print $1'})/g" .config.sample'
 		sh 'sed -i -e "s/stun.example.com/stun.task3acrdemo.com/g" .config.sample'
-		sh 'sed -i -e "s/\/path\/to\/cert.pem/\/etc\/asterisk\/keys/\star.pem/g" .config.sample'
-		sh 'sed -i -e "s/\/path\/to\/cert.key/\/etc\/asterisk\/keys/\star.key/g" .config.sample'
 		sh 'sed -i -e "s/hostname/ace-direct-mysql.ceq7afndeyku.us-east-1.rds.amazonaws.com/g" .config.sample'
 		sh 'sed -i -e "s/database/asterisk/g/" .config.sample'
 		sh 'sed -i -e "s/table/vasip/g" .config.sample'
