@@ -10,7 +10,7 @@ pipeline {
     	stage('Build') { 
             steps {
                 sh 'pwd && ls -lthr'
-		sh 'cd asterisk-codev/scripts/'
+		sh 'cd asterisk-codev/scripts/ && ls -lthr'
 		sh 'export IP_ADDR=$(hostname -I | awk "{print $1}")'
 		sh 'sed -i -e "s/192.168.0.1/$IP_ADDR/g" .config.sample'
 		sh 'sed -i -e "s/8.8.8.8/$IP_ADDR/g" .config.sample'
