@@ -22,6 +22,7 @@ function show_instructions {
 		echo "+            --no-build    : Optional : Opts not to build the Asterisk source code                +"
 		echo "+            --ast-version : Optional : Specifies the next arg is the version of Asterisk         +"
 		echo "+            --pj-version  : Optional : Specifies the next arg is the version of PJ-Project       +"		
+		echo "+            --no-restart  : Optional : Skipps executing 'service asterisk restart'               +"
 		echo "+            --clean       : Optional : Removes build artifacts and directories                   +"
                 echo "+-------------------------------------------------------------------------------------------------+"
                 echo
@@ -34,6 +35,7 @@ function error_check_args {
 	astVersion="15.3.0"
 	pjVersion="2.7.1"
 	done=false
+	restartAst=true
 
 	while [ !done ]
 	do
@@ -64,6 +66,10 @@ function error_check_args {
 						exit 1;;
 					*) pjVersion=$2; shift 2 ;;
 				esac ;;
+			--no-restart)
+				restartAst=false
+				shift
+				;;
 			--clean)
 				clean=true
 				shift
@@ -175,7 +181,7 @@ function main {
 
 	# build
 	if [ $buildAst == "true" ]; then
-		./configure --with-externals-cache="${instLoc}external-cache"
+		./configure --with-externals-cache="${instLoc}external-cache" NOISY_BUILD=yes
 		make 
 		make install
 		if [[ $? == "0" ]];then
@@ -218,7 +224,9 @@ function main {
 	fi
 
 	# restart the Asterisk instance
-	service asterisk restart
+	if $restartAst; then
+		service asterisk restart
+	fi
 }
 
 # main entry point

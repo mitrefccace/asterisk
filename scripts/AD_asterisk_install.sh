@@ -8,9 +8,6 @@ startPath=$(pwd)
 #we need this to generate the self-signed Asterisk certs
 PUBLIC_IP=''
 
-#default STUN will be set to Google
-GOOGLE='stun4.l.google.com:19302'
-
 #Asterisk version
 AST_VERSION="15.3.0"
 
@@ -19,6 +16,9 @@ INPUT=.config
 
 #Hostname command suggestion
 HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
+
+# This flag is used to install Asterisk in relation to 
+CI_MODE=false
 
 print_message() {
         # first argument is the type of message
@@ -79,51 +79,81 @@ echo "============================================================"
 	
         done < $INPUT
 
-#check for IPv6 and SElinux
 
-DISABLED="disabled"
-SESTATUS=$(sestatus | head -1 | awk '{print $3}')
-IPV6=$(cat /proc/net/if_inet6)
+while true
+do
+	case "$1" in
+		--ci-mode)
+			CI_MODE=true
+			shift;;
+		"") break;;
+                *)
+	                print_message "Error" "unkown argument  ---> exiting program"
+                        exit 1
+        esac
+done
 
-if [ $SESTATUS != $DISABLED ]
-then
-    echo "ERROR: SELinux must be disabled before running Asterisk. Disable SELinux, reboot the server, and try again."
-    exit 1
+echo "CI MODE: $CI_MODE"
+
+# If CI_MODE is enabled, these will append flags to build_pjproject and 
+# update_asterisk to prevent functionality that is needed when asterisk
+# is running during Docker builds
+if $CI_MODE; then
+	BUILD_PJ_ARG="--no-restart"
+	UPDATE_AST_ARG="--no-db"
+else
+	UPDATE_AST_ARG="--restart"
 fi
 
-if [ -n "$IPV6" ]
-then
-    echo "ERROR: IPv6 must be disabled before installing Asterisk. See README.md for more information. Disable IPv6 then try again"
-    exit 1
-fi
+#check for IPv6 and SElinux (skipped in CI MODE)
 
-#check hostname and fail if not set
-HOSTNAME=$(hostname -f)
-if [ -z $HOSTNAME ]
-then
-	echo "ERROR: no hostname set on this server. Set the hostname, then re run the script."
-	echo $HOST_SUGG
-	exit 1
-fi
+if [ ! CI_MODE ]; then
 
-#ask user to validate hostname
-echo "The hostname of this server is currently $HOSTNAME. Is this the hostname you want to use with Asterisk? (y/n)"
-read response
-if [ $response == "n" ]
+	DISABLED="disabled"
+	SESTATUS=$(sestatus | head -1 | awk '{print $3}')
+	IPV6=$(cat /proc/net/if_inet6)
+
+	if [ $SESTATUS != $DISABLED ]
 	then
-	echo "Exiting. Set the hostname, then rerun the script."
-	echo $HOST_SUGG
-	exit 0
-fi
+		echo "ERROR: SELinux must be disabled before running Asterisk. Disable SELinux, reboot the server, and try again."
+		exit 1
+	fi
 
-# prompt user to update packages
-echo "It is recommended to update the packages in your system. Proceed? (y/n)"
-read response2
+	if [ -n "$IPV6" ]
+	then
+		echo "ERROR: IPv6 must be disabled before installing Asterisk. See README.md for more information. Disable IPv6 then try again"
+		exit 1
+	fi
 
-if [ $response2 == "y" ]
-then
-    echo "Executing yum update"
-    yum -y update
+	#check hostname and fail if not set
+	HOSTNAME=$(hostname -f)
+	if [ -z $HOSTNAME ]
+	then
+		echo "ERROR: no hostname set on this server. Set the hostname, then re run the script."
+		echo $HOST_SUGG
+		exit 1
+	fi
+
+	#ask user to validate hostname
+	echo "The hostname of this server is currently $HOSTNAME. Is this the hostname you want to use with Asterisk? (y/n)"
+	read response
+	if [ $response == "n" ]
+		then
+		echo "Exiting. Set the hostname, then rerun the script."
+		echo $HOST_SUGG
+		exit 0
+	fi
+
+	# prompt user to update packages
+	echo "It is recommended to update the packages in your system. Proceed? (y/n)"
+	read response2
+
+	if [ $response2 == "y" ]
+	then
+		echo "Executing yum update"
+		yum -y update
+	fi
+
 fi
 
 # installing pre-requisite packages
@@ -144,29 +174,37 @@ sed -i -e 's/pjproject-devel //' contrib/scripts/install_prereq
 cd $startPath
 # Apply custom Asterisk patches, then apply custom PJPROJECT patch and install PJ and Asterisk
 ./update_asterisk.sh --patch --no-build --no-db
-./build_pjproject.sh --clean
+./build_pjproject.sh --clean $BUILD_PJ_ARG
 
 #run ldconfig so that Asterisk finds PJPROJECT packages
 echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
 /sbin/ldconfig
 
-echo "Generating the Asterisk self-signed certificates. You will be prompted to enter a password or passphrase for the private key."
-sleep 2
 
-#generate TIS certificates
-/usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
+# skip the self-signed cert creating in CI MODE
+if [ ! CI_MODE ]; then
+
+	echo "Generating the Asterisk self-signed certificates. You will be prompted to enter a password or passphrase for the private key."
+	sleep 2
+
+	#generate TIS certificates
+	/usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
+
+fi
 
 repo=$(dirname $startPath)
 cd $repo
 
 #copy iTRS lookup script to agi-bin and make it executable
+mkdir -p /var/lib/asterisk/agi-bin
 yes | cp -rf scripts/itrslookup.sh /var/lib/asterisk/agi-bin
 chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 
-#modify configs with named params and populate AstDB
+#modify configs with named params and populate AstDB if
+#not in CI_MODE
 
 cd $startPath
-./update_asterisk.sh --config --media --restart
+./update_asterisk.sh --config --media $UPDATE_AST_ARG
 
 echo ""
 echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"
