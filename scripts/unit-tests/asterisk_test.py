@@ -52,7 +52,7 @@ class AsteriskTests(unittest.TestCase):
 
 		# stop asterisk service
 		com = Commands.OsCommand('sudo service asterisk stop')
-		rez = com.execute(1)
+		rez = com.execute(3)
        	
        		# check the output of PAC
 		com = Commands.OsCommand('sudo ./update_asterisk.sh --config')
@@ -66,7 +66,7 @@ class AsteriskTests(unittest.TestCase):
        	
 		# start the asterisk service back up
 		com = Commands.OsCommand('sudo service asterisk start')
-		rez = com.execute(1)
+		rez = com.execute(3)
 	
 	def test_pjsip_endpoints(self):
 		# alert the user of the current test

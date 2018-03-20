@@ -17,7 +17,7 @@ class BaseCommand(object):
 	def execute(self, sleep_time):
 		ps = sub.Popen(self.command_list, stdout=sub.PIPE)
 		(output, err) = ps.communicate()
-		if sleep_time:
+		if sleep_time > 0:
 			time.sleep(sleep_time)
 		if not err:
 			return output			
