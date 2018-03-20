@@ -79,7 +79,7 @@ class AsteriskTests(unittest.TestCase):
 		while objFound is "":
 			objFound = lines.pop()
 		numEndpoints = int(objFound.split(':')[1].strip())
-		self.assertGreater(numEndpoints, 0)
+		self.assertEqual(numEndpoints, self.configs['asterisk']['num_endpoints'])
 	
 	def test_db_entries(self):
 		# alert the user of the current test
@@ -92,7 +92,7 @@ class AsteriskTests(unittest.TestCase):
 		while objFound is "":
 			objFound = lines.pop()
 		numEntries = int(objFound.split(' ')[0].strip())
-		self.assertGreater(numEntries, 0)		
+		self.assertEqual(numEntries, self.configs['asterisk']['num_db_entries'] )		
 
 	def test_cdr_db(self):
 		# alert the user of the current test
@@ -130,10 +130,8 @@ class AsteriskTests(unittest.TestCase):
 		com = Commands.AstCommand('queue show')
 		rez = com.execute(0)
 		# sometimes the queue show returns 'No such command' so loop to get proper resp
-		numTries = 3
-		while ((rez.split(' ')[0].strip() == 'No') and numTries):
+		while rez.split(' ')[0].strip() == 'No':
 			rez = com.execute(0)
-			numTries = numTries-1
 		lines = rez.split('\n')
 		queues = []
 		for line in lines:
@@ -141,7 +139,7 @@ class AsteriskTests(unittest.TestCase):
 			if position > 0:
 				queue = line.split(' ')[0].strip()
 				queues.append(queue)
-		self.assertEqual(len(queues), self.configs["asterisk"]["numQueues"])
+		self.assertEqual(len(queues), self.configs["asterisk"]["num_queues"])
 
 	@classmethod
 	def tearDownClass(cls):
