@@ -1,7 +1,9 @@
 {
 	"asterisk": {
 		"stun": "stun.task3acrdemo.com",
-		"numQueues": 3
+		"num_queues": 3,
+		"num_endpoints": 39,
+		"num_db_entries": 7
 	}
 }
 
