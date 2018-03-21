@@ -55,7 +55,7 @@ class AsteriskTests(unittest.TestCase):
 		rez = com.execute(3)
        	
        		# check the output of PAC
-		com = Commands.OsCommand('sudo ./update_asterisk.sh --config')
+		com = Commands.OsCommand('sudo ./update_asterisk.sh --config --backup')
 		rez = com.execute(0)
 		lines = rez.split('\n')
 		msg = lines.pop()
