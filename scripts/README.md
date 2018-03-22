@@ -129,7 +129,30 @@ from the Allow Header for outbound SIP/SDP INVITES. To do this, the script accom
 * The correct version of PJPROJECT is pulled down from the Asterisk third-party repository.
 * This is then uncompressed and the patch to sip_inv.c (found in patches/pjproject/2.6/) is applied. 
 * This source code is then packaged back into a .bz2 file and placed within an external-cache folder in /usr/src.
-* This directory must also contain the md5 file for the .bz2 source code in order for it to be verified during the Asterisk configure process.  
+* This directory must also contain the md5 checksum file for the .bz2 source code in order for it to be verified during the Asterisk ./configure process.  
 * Once these two files have been provisioned, Asterisk can be configured with the --with-externals-cache flag pointing to to our two new resources in /usr/src/external-cache
 * Asterisk is then built as usual and restarted to complete the installation process.
- 
+
+## Example Usage
+
+This will rebuild the Asterisk 15.3.0-rc1 source code with our custom patched version of PjProject 2.7.1. The __--clean__ flag will remove some of the build artifacts and temporary directories created by the script.
+If you run it without any arguments:
+
+``` sh
+$ ./build_pjproject.sh --ast-version 15.3.0-rc1 --pj-version 2.7.1 --clean
+```
+
+If you would like to use the default values, run the following command:
+
+``` sh
+$ ./build_pjproject.sh
+```
+
+Then it will assume the following values:
+
+|         Flag        |          Value           |
+|--------------------:|-------------------------:|
+Asterisk Version      |  15.3.0-rc1
+PJ-Project Version    |  2.7.1
+Rebuild Asterisk      |  true
+Remove Artifacts      |  false
