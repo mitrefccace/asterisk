@@ -31,7 +31,7 @@ function error_check_args {
 	# vars
 	build=true
 	clean=false
-	astVersion="15.3.0-rc1"
+	astVersion="15.3.0"
 	pjVersion="2.7.1"
 	done=false
 

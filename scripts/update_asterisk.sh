@@ -280,7 +280,7 @@ function apply_asterisk_patches {
 	if [[ $versionNum == "" ]]; then
 		#printf "Please enter an Asterisk version number: "
 		#read versionNum
-		versionNum="15.3.0-rc1"
+		versionNum="15.3.0"
 	fi
 
 	asteriskPath=$(find / -type d -name "asterisk-${versionNum}")
