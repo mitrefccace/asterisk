@@ -114,10 +114,10 @@ the project after applying the patches.
 ## Example usage
 
 ```sh
-$ ./update_asterisk.sh --version 15.1.2 --patch --config --dialin 7032935641 --media --backup --restart --cli
+$ ./update_asterisk.sh --version 15.3.0 --patch --config --dialin 7032935641 --media --backup --restart --cli
 
 ```
-* The example above will look for the asterisk-15.1.2 repository so that it can apply the patch files then rebuild
+* The example above will look for the asterisk-15.3.0 repository so that it can apply the patch files then rebuild
 the source. Afterwards, it will handle the replacement of the configuration files and media files after creating backups of each directory, set the dialin value in the Asterisk 
 database to 7032935641, restart, and launch the Asterisk CLI.
 
