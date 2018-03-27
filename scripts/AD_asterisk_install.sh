@@ -12,7 +12,7 @@ PUBLIC_IP=''
 GOOGLE='stun4.l.google.com:19302'
 
 #Asterisk version
-AST_VERSION="15.3.0-rc1"
+AST_VERSION="15.3.0"
 
 # Config file
 INPUT=.config
