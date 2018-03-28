@@ -136,7 +136,6 @@ from the Allow Header for outbound SIP/SDP INVITES. To do this, the script accom
 ## Example Usage
 
 This will rebuild the Asterisk 15.3.0 source code with our custom patched version of PjProject 2.7.1. The __--clean__ flag will remove some of the build artifacts and temporary directories created by the script.
-If you run it without any arguments:
 
 ``` sh
 $ ./build_pjproject.sh --ast-version 15.3.0 --pj-version 2.7.1 --clean
