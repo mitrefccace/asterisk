@@ -1,0 +1,24 @@
+--- res_format_attr_h264.c	2018-03-28 15:34:42.000000000 -0400
++++ res_format_attr_h264.c.videoDowngrade	2018-03-28 15:44:05.000000000 -0400
+@@ -190,6 +190,12 @@
+ 			attr->PROFILE_IDC = ((val2 >> 16) & 0xFF);
+ 			attr->PROFILE_IOP = ((val2 >> 8) & 0xFF);
+ 			attr->LEVEL = (val2 & 0xFF);
++			/* MITRE mod: change the incoming SDP to be baseline if high level was in original offer */
++			if (attr->PROFILE_IDC == 0x64) {
++				ast_log(AST_LOG_NOTICE, "Changing PROFILE_IDC from 0x64 to 0x42 when it comes in\n");
++				attr->PROFILE_IDC = 0x42;
++			}
++
+ 		} else if (sscanf(attrib, "sprop-parameter-sets=%" H264_MAX_SPS_PPS_SIZE_SCAN_LIMIT "[^','],%" H264_MAX_SPS_PPS_SIZE_SCAN_LIMIT "s", attr->SPS, attr->PPS) == 2) {
+ 			/* XXX sprop-parameter-sets can actually be of unlimited length. This may need to be addressed later. */
+ 		} else if (sscanf(attrib, "max-mbps=%30u", &val) == 1) {
+@@ -282,7 +288,7 @@
+ 	APPEND_IF_NOT_H264_UNSET(attr->PACKETIZATION_MODE, str, "packetization-mode");
+ 	APPEND_IF_NOT_H264_UNSET(attr->LEVEL_ASYMMETRY_ALLOWED, str, "level-asymmetry-allowed");
+ 
+-	if (attr->PROFILE_IDC && attr->PROFILE_IOP && attr->LEVEL) {
++	if (attr->PROFILE_IDC | attr->PROFILE_IOP | attr->LEVEL) {
+ 		if (added) {
+ 			ast_str_append(str, 0, ";");
+ 		} else if (0 < ast_str_append(str, 0, "a=fmtp:%u ", payload)) {
