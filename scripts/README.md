@@ -49,13 +49,14 @@ Before executing the install script, you MUST modify this file with the values f
 
 (Note: the OS will need additional configurations to enable Asterisk to connect to MySQL. See the docs directory in the main ACE Direct repo for more info.)
 
+--------------------------------------------
+## Installation
 
 Run the following command to install the latest version of Asterisk:
 
 ``` sh
 $ ./AD_asterisk_install.sh
 ```
-
 --------------------------------------------
 
 ## Twilio
