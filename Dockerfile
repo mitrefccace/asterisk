@@ -34,14 +34,14 @@ RUN export IP_ADDR=$(hostname -I | awk "{print $1}") && \
 # run git config because build_pjproject runs a 'git clone'
 # to pull down the asterisk third-party package. (don't know why we need
 # to set git config, should pick up http_proxy envt var.........)
-
 RUN echo "proxy=$http_proxy" >> /etc/yum.conf
-RUN yum install -y git && git config --global http.proxy $http_proxy
-
 # The MITRE & ECE proxies don't play well with the CentOS mirrors,
 # so we'll use the base URL instead
 RUN sed -i -e 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Base.repo && \
 	sed -i -e 's/#baseurl/baseurl/g' /etc/yum.repos.d/CentOS-Base.repo
+
+RUN yum install -y git && git config --global http.proxy $http_proxy
+
 
 # need to set the #TERM var for the script log messages
 RUN export $TERM=xterm
