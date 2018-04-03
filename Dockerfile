@@ -38,7 +38,7 @@ RUN echo "proxy=$http_proxy" >> /etc/yum.conf
 # The MITRE & ECE proxies don't play well with the CentOS mirrors,
 # so we'll use the base URL instead
 RUN sed -i -e 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Base.repo && \
-	sed -i -e 's/#baseurl/baseurl/g' /etc/yum.repos.d/CentOS-Base.repo
+	sed -i -e 's/#baseurl/baseurl/g' /etc/yum.repos.d/CentOS-Base.repo && \
 	sed -i -e 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.conf
 
 RUN yum clean all && yum update -y && yum install -y git && \
