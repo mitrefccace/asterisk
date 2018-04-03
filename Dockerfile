@@ -41,7 +41,7 @@ RUN sed -i -e 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Base.repo && 
 	sed -i -e 's/#baseurl/baseurl/g' /etc/yum.repos.d/CentOS-Base.repo && \
 	sed -i -e 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.conf
 
-RUN yum clean all && yum clean metadata && rm -rf /var/cache/yum/* && \
+RUN yum clean all && yum clean metadata && rm -rf /var/cache/yum && \
 	yum install -y git && git config --global http.proxy $http_proxy
 
 
