@@ -40,7 +40,8 @@ RUN echo "proxy=$http_proxy" >> /etc/yum.conf
 RUN sed -i -e 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Base.repo && \
 	sed -i -e 's/#baseurl/baseurl/g' /etc/yum.repos.d/CentOS-Base.repo
 
-RUN yum clean all && yum install -y git && git config --global http.proxy $http_proxy
+RUN yum clean all && yum update -y && yum install -y git && \
+	git config --global http.proxy $http_proxy
 
 
 # need to set the #TERM var for the script log messages
