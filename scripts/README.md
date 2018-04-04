@@ -50,6 +50,14 @@ Before executing the install script, you MUST modify this file with the values f
 (Note: the OS will need additional configurations to enable Asterisk to connect to MySQL. See the docs directory in the main ACE Direct repo for more info.)
 
 --------------------------------------------
+## Installation
+
+Run the following command to install the latest version of Asterisk:
+
+``` sh
+$ ./AD_asterisk_install.sh
+```
+--------------------------------------------
 
 ## Twilio
 
@@ -103,9 +111,8 @@ so that the reverse patch is not applied. If you do not specify the Asterisk ver
 running, then you will be prompted for this information. 
 
 ##### Process
-* The script functions by determining which files to patch by searching for the __asterisk-ace-direct__ 
-repo in the file system.
-* Once there, it reads patch files such as __foo.c.patch__ within the patch directory and searches for the 
+* The script functions by determining which files to patch by searching within the patch directory.
+* Once there, it reads patch files such as __foo.c.patch__ and searches for the 
 __foo.c__ source file within the __Asterisk-x.x.x__ directory. If the file is not found, it will alert the user. 
 * After the patches have been applied with the __patch__ command, the Asterisk source code may be recompiled 
 using the __make__ commands. Just add the __--build__ to execute these commands and build 
@@ -136,7 +143,6 @@ from the Allow Header for outbound SIP/SDP INVITES. To do this, the script accom
 ## Example Usage
 
 This will rebuild the Asterisk 15.3.0 source code with our custom patched version of PjProject 2.7.1. The __--clean__ flag will remove some of the build artifacts and temporary directories created by the script.
-If you run it without any arguments:
 
 ``` sh
 $ ./build_pjproject.sh --ast-version 15.3.0 --pj-version 2.7.1 --clean
