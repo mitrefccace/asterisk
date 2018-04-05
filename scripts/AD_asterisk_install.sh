@@ -173,7 +173,7 @@ echo "Generating the Asterisk self-signed certificates. You will be prompted to 
 sleep 2
 
 #generate TIS certificates
-/usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
+$instLoc/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 
 repo=$(dirname $startPath)
 cd $repo
