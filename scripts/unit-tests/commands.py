@@ -33,7 +33,7 @@ class OsCommand(BaseCommand):
 class AstCommand(BaseCommand):
 	
 	def __init__(self, cs):
-		self.command_list = ['sudo', 'asterisk', '-rx']
+		self.command_list = ['asterisk', '-rx']
 		self.command_list.append(cs)
 
 	def execute(self, sleep_time):
