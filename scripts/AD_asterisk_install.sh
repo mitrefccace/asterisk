@@ -131,6 +131,7 @@ fi
 
 # installing pre-requisite packages
 echo "Installing pre-requisite packages for Asterisk and PJPROJECT"
+yum -y install --skip-broken epel-release bzip2 dmidecode gcc-c++ ncurses-devel libxml2-devel make wget netstat telnet vim zip unzip openssl-devel newt-devel kernel-devel libuuid-devel gtk2-devel jansson-devel binutils-devel git libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel mysql-connector-odbc tcpdump patch sqlite bind-utils
 
 if [ -f /etc/redhat-release ]
 then
@@ -147,8 +148,6 @@ then
 	wget http://mirror.centos.org/centos/7/os/x86_64/Packages/libsrtp-devel-1.4.4-10.20101004cvs.el7.x86_64.rpm
 	yum localinstall --nogpgcheck libsrtp-devel-1.4.4-10.20101004cvs.el7.x86_64.rpm -y
 fi
-
-yum -y install --skip-broken epel-release bzip2 dmidecode gcc-c++ ncurses-devel libxml2-devel make wget netstat telnet vim zip unzip openssl-devel newt-devel kernel-devel libuuid-devel gtk2-devel jansson-devel binutils-devel git libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel mysql-connector-odbc tcpdump patch sqlite bind-utils
 
 #download Asterisk
 cd $instLoc
