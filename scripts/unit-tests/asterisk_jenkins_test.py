@@ -41,11 +41,11 @@ class AsteriskTests(unittest.TestCase):
 		print ('\nTesting ---> Asterisk Service Down?')
 
 		# stop asterisk service
-		com = Commands.OsCommand('sudo service asterisk stop')
+		com = Commands.OsCommand('/usr/bin/sudo service asterisk stop')
 		rez = com.execute(3)
        	
        		# check the output of PAC
-		com = Commands.OsCommand('sudo {} --config --backup'.format(Utilities.find_file('update_asterisk.sh')))
+		com = Commands.OsCommand('/usr/bin/sudo {} --config --backup'.format(Utilities.find_file('update_asterisk.sh')))
 		rez = com.execute(0)
 		lines = rez.split('\n')
 		msg = lines.pop()
@@ -55,7 +55,7 @@ class AsteriskTests(unittest.TestCase):
 		self.assertEqual(msg, correct)
        	
 		# start the asterisk service back up
-		com = Commands.OsCommand('sudo service asterisk start')
+		com = Commands.OsCommand('/usr/bin/sudo service asterisk start')
 		rez = com.execute(3)
 	
 	def test_pjsip_endpoints(self):
