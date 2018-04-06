@@ -84,53 +84,53 @@ class AsteriskTests(unittest.TestCase):
 #		numEntries = int(objFound.split(' ')[0].strip())
 #		self.assertEqual(numEntries, self.configs['asterisk']['num_db_entries'] )		
 #
-#	def test_cdr_db(self):
-#		# alert the user of the current test
-#		print ('\nTesting ---> Asterisk Connected to CDR DB?')
-#		
-#		com = Commands.AstCommand('cdr show status')
-#		rez = com.execute(0)
-#		lines = rez.split('\n')
-#		status = ''
-#		for line in lines:
-#			words = line.split(':')
-#			for i, word in enumerate(words):
-#				clean = word.strip()
-#				if clean == 'Logging':
-#					status = words[i+1].strip()
-#		self.assertEqual(status, "Enabled")
-#			
-#	def test_stun_server(self):
-#		# alert the user of the current test
-#		print ('\nTesting ---> Asterisk STUN Server?')
-#	
-#		com = Commands.AstCommand('stun show status')
-#		rez = com.execute(0)
-#		lines = rez.split('\n')
-#		stunLine = lines.pop()
-#		while stunLine is "":
-#			stunLine = lines.pop()
-#		stun = stunLine.split(' ')[0].strip()
-#		self.assertEqual(stun, self.configs["asterisk"]["stun"])		
-#
-#	def test_queues(self):
-#		# alert the user of the current test
-#		print ('\nTesting ---> Asterisk Queue Number Non-Zero?')
-#
-#		com = Commands.AstCommand('queue show')
-#		rez = com.execute(0)
-#		# sometimes the queue show returns 'No such command' so loop to get proper resp
-#		while rez.split(' ')[0].strip() == 'No':
-#			rez = com.execute(0)
-#		lines = rez.split('\n')
-#		queues = []
-#		for line in lines:
-#			position = line.find('Queue')
-#			if position > 0:
-#				queue = line.split(' ')[0].strip()
-#				queues.append(queue)
-#		self.assertEqual(len(queues), self.configs["asterisk"]["num_queues"])
-#
+	def test_cdr_db(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Connected to CDR DB?')
+		
+		com = Commands.AstCommand('cdr show status')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		status = ''
+		for line in lines:
+			words = line.split(':')
+			for i, word in enumerate(words):
+				clean = word.strip()
+				if clean == 'Logging':
+					status = words[i+1].strip()
+		self.assertEqual(status, "Enabled")
+			
+	def test_stun_server(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk STUN Server?')
+	
+		com = Commands.AstCommand('stun show status')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		stunLine = lines.pop()
+		while stunLine is "":
+			stunLine = lines.pop()
+		stun = stunLine.split(' ')[0].strip()
+		self.assertEqual(stun, self.configs["asterisk"]["stun"])		
+
+	def test_queues(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Queue Number Non-Zero?')
+
+		com = Commands.AstCommand('queue show')
+		rez = com.execute(0)
+		# sometimes the queue show returns 'No such command' so loop to get proper resp
+		while rez.split(' ')[0].strip() == 'No':
+			rez = com.execute(0)
+		lines = rez.split('\n')
+		queues = []
+		for line in lines:
+			position = line.find('Queue')
+			if position > 0:
+				queue = line.split(' ')[0].strip()
+				queues.append(queue)
+		self.assertEqual(len(queues), self.configs["asterisk"]["num_queues"])
+
 
 if __name__ == '__main__':
 	sys.exit(unittest.main())
