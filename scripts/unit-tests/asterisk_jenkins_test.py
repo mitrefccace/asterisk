@@ -36,28 +36,6 @@ class AsteriskTests(unittest.TestCase):
 			print('Error occured while setting up the test class ---> Aborting Test')
 			sys.exit(-1)
 
-	def test_ast_service_down(self):
-       		# alert the user of the current test
-		print ('\nTesting ---> Asterisk Service Down?')
-
-		# stop asterisk service
-		com = Commands.OsCommand('service asterisk stop')
-		rez = com.execute(3)
-       	
-       		# check the output of PAC
-		com = Commands.OsCommand('{} --config --backup'.format(Utilities.find_file('update_asterisk.sh')))
-		rez = com.execute(0)
-		lines = rez.split('\n')
-		msg = lines.pop()
-		while msg is "":
-			msg = lines.pop()
-		correct = '\x1b[31mError -- \x1b(B\x1b[mAsterisk service is unreachable ---> Installation canceled'
-		self.assertEqual(msg, correct)
-       	
-		# start the asterisk service back up
-		com = Commands.OsCommand('service asterisk start')
-		rez = com.execute(3)
-	
 	def test_pjsip_endpoints(self):
 		# alert the user of the current test
 		print ('\nTesting ---> PJSIP Endpoints Loaded?')
