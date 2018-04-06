@@ -36,6 +36,20 @@ class AsteriskTests(unittest.TestCase):
 			print('Error occured while setting up the test class ---> Aborting Test')
 			sys.exit(-1)
 
+	def test_ast_service_down(self):
+		# alert the user of the current test
+		print('\nTesting ---> Asterisk Service Up?')
+		com = Commands.OsCommand('service asterisk status')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		status = ''
+		for line in lines:
+			words = line.split(':')
+			key = words[0].strip()
+			if key == 'Active':
+				status = words[1].split(' ')[1]	
+		self.assertEqual(status, 'active')
+
 	def test_pjsip_endpoints(self):
 		# alert the user of the current test
 		print ('\nTesting ---> PJSIP Endpoints Loaded?')
