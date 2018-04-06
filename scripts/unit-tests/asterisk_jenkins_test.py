@@ -71,19 +71,19 @@ class AsteriskTests(unittest.TestCase):
 		numEndpoints = int(objFound.split(':')[1].strip())
 		self.assertEqual(numEndpoints, self.configs['asterisk']['num_endpoints'])
 	
-#	def test_db_entries(self):
-#		# alert the user of the current test
-#		print ('\nTesting ---> Asterisk Database Entries?')
-#		
-#		com = Commands.AstCommand('database show')
-#		rez = com.execute(0)
-#		lines = rez.split('\n')
-#		objFound = lines.pop()
-#		while objFound is "":
-#			objFound = lines.pop()
-#		numEntries = int(objFound.split(' ')[0].strip())
-#		self.assertEqual(numEntries, self.configs['asterisk']['num_db_entries'] )		
-#
+	def test_db_entries(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Database Entries?')
+		
+		com = Commands.AstCommand('database show')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		objFound = lines.pop()
+		while objFound is "":
+			objFound = lines.pop()
+		numEntries = int(objFound.split(' ')[0].strip())
+		self.assertEqual(numEntries, self.configs['asterisk']['num_db_entries'] )		
+
 	def test_cdr_db(self):
 		# alert the user of the current test
 		print ('\nTesting ---> Asterisk Connected to CDR DB?')
