@@ -36,27 +36,27 @@ class AsteriskTests(unittest.TestCase):
 			print('Error occured while setting up the test class ---> Aborting Test')
 			sys.exit(-1)
 
-#	def test_ast_service_down(self):
-#       		# alert the user of the current test
-#		print ('\nTesting ---> Asterisk Service Down?')
-#
-#		# stop asterisk service
-#		com = Commands.OsCommand('service asterisk stop')
-#		rez = com.execute(3)
-#       	
-#       		# check the output of PAC
-#		com = Commands.OsCommand('{} --config --backup'.format(Utilities.find_file('update_asterisk.sh')))
-#		rez = com.execute(0)
-#		lines = rez.split('\n')
-#		msg = lines.pop()
-#		while msg is "":
-#			msg = lines.pop()
-#		correct = '\x1b[31mError -- \x1b(B\x1b[mAsterisk service is unreachable ---> Installation canceled'
-#		self.assertEqual(msg, correct)
-#       	
-#		# start the asterisk service back up
-#		com = Commands.OsCommand('service asterisk start')
-#		rez = com.execute(3)
+	def test_ast_service_down(self):
+       		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Service Down?')
+
+		# stop asterisk service
+		com = Commands.OsCommand('service asterisk stop')
+		rez = com.execute(3)
+       	
+       		# check the output of PAC
+		com = Commands.OsCommand('{} --config --backup'.format(Utilities.find_file('update_asterisk.sh')))
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		msg = lines.pop()
+		while msg is "":
+			msg = lines.pop()
+		correct = '\x1b[31mError -- \x1b(B\x1b[mAsterisk service is unreachable ---> Installation canceled'
+		self.assertEqual(msg, correct)
+       	
+		# start the asterisk service back up
+		com = Commands.OsCommand('service asterisk start')
+		rez = com.execute(3)
 	
 	def test_pjsip_endpoints(self):
 		# alert the user of the current test
@@ -71,18 +71,18 @@ class AsteriskTests(unittest.TestCase):
 		numEndpoints = int(objFound.split(':')[1].strip())
 		self.assertEqual(numEndpoints, self.configs['asterisk']['num_endpoints'])
 	
-	def test_db_entries(self):
-		# alert the user of the current test
-		print ('\nTesting ---> Asterisk Database Entries?')
-		
-		com = Commands.AstCommand('database show')
-		rez = com.execute(0)
-		lines = rez.split('\n')
-		objFound = lines.pop()
-		while objFound is "":
-			objFound = lines.pop()
-		numEntries = int(objFound.split(' ')[0].strip())
-		self.assertEqual(numEntries, self.configs['asterisk']['num_db_entries'] )		
+#	def test_db_entries(self):
+#		# alert the user of the current test
+#		print ('\nTesting ---> Asterisk Database Entries?')
+#		
+#		com = Commands.AstCommand('database show')
+#		rez = com.execute(0)
+#		lines = rez.split('\n')
+#		objFound = lines.pop()
+#		while objFound is "":
+#			objFound = lines.pop()
+#		numEntries = int(objFound.split(' ')[0].strip())
+#		self.assertEqual(numEntries, self.configs['asterisk']['num_db_entries'] )		
 
 	def test_cdr_db(self):
 		# alert the user of the current test
