@@ -41,23 +41,15 @@ class AsteriskTests(unittest.TestCase):
 		print('\nTesting ---> Asterisk Service Up?')
 		com = Commands.OsCommand('service asterisk status')
 		rez = com.execute(0)
-		print(rez)
-		lines = rez.split('\n')
-		status = ''
-		for line in lines:
-			words = line.split(':')
-			key = words[0].strip()
-			if key == 'Active':
-				status = words[1].split(' ')[1]	
-		self.assertEqual(status, 'active')
-
+		index = rez.find('running') + 1# returns -1 if substr not found
+		self.assertTrue(index)
+	
 	def test_pjsip_endpoints(self):
 		# alert the user of the current test
 		print ('\nTesting ---> PJSIP Endpoints Loaded?')
 		
 		com = Commands.AstCommand('pjsip show endpoints')
 		rez = com.execute(0)
-		print(rez)
 		lines = rez.split('\n')
 		objFound = lines.pop()
 		while objFound is "":
@@ -71,7 +63,6 @@ class AsteriskTests(unittest.TestCase):
 		
 		com = Commands.AstCommand('database show')
 		rez = com.execute(0)
-		print(rez)
 		lines = rez.split('\n')
 		objFound = lines.pop()
 		while objFound is "":
