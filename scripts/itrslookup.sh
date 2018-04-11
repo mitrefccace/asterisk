@@ -23,6 +23,7 @@ PURPLE="vrs-bgw.prod.purple.us"
 GLOBAL="globalvrs.tv"
 SORENSON="p.ci.svrs.net"
 SORENSON2="p2.ci.svrs.net"
+SORENSONQA="p.ci-qa-a.svrs.net"
 ZVRS="sbc.prod.champvrs.com"
 
 ITRSIP="156.154.59.67"
@@ -86,6 +87,8 @@ elif [ $SIPHOST == $GLOBAL ]; then
 elif [ $SIPHOST == $SORENSON ]; then
         echo "SET VARIABLE endpoint Sorenson"
 elif [ $SIPHOST == $SORENSON2 ]; then
+        echo "SET VARIABLE endpoint Sorenson"
+elif [ $SIPHOST == $SORENSONQA ]; then
         echo "SET VARIABLE endpoint Sorenson"
 elif [ $SIPHOST == $ZVRS ]; then
         echo "SET VARIABLE endpoint ZVRS"
