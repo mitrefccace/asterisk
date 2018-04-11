@@ -41,6 +41,7 @@ class AsteriskTests(unittest.TestCase):
 		print('\nTesting ---> Asterisk Service Up?')
 		com = Commands.OsCommand('service asterisk status')
 		rez = com.execute(0)
+		print(rez)
 		lines = rez.split('\n')
 		status = ''
 		for line in lines:
@@ -56,6 +57,7 @@ class AsteriskTests(unittest.TestCase):
 		
 		com = Commands.AstCommand('pjsip show endpoints')
 		rez = com.execute(0)
+		print(rez)
 		lines = rez.split('\n')
 		objFound = lines.pop()
 		while objFound is "":
@@ -69,6 +71,7 @@ class AsteriskTests(unittest.TestCase):
 		
 		com = Commands.AstCommand('database show')
 		rez = com.execute(0)
+		print(rez)
 		lines = rez.split('\n')
 		objFound = lines.pop()
 		while objFound is "":
