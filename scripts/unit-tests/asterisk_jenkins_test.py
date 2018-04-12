@@ -87,23 +87,23 @@ class AsteriskTests(unittest.TestCase):
 					status = words[i+1].strip()
 		self.assertEqual(status, "Enabled")
 			
-	def test_odbc_connections(self):
-		# alert the user of the current test
-		print('\nTesting ---> Asterisk ODBC Connected?')
-		
-		com = Commands.AstCommand('odbc show all')
-		rez = com.execute(0)
-		lines = rez.split('\n')
-		bottomLine = lines.pop()
-		while bottomLine is "":
-			bottomLine = lines.pop()
-		content = bottomLine.split(' ')	
-		numConnections = 0
-		for ii, elem in enumerate(content):
-			if elem == 'connections:':
-				numConnections = int(content[ii+1])
-				break
-		self.assertTrue(numConnections)	
+#	def test_odbc_connections(self):
+#		# alert the user of the current test
+#		print('\nTesting ---> Asterisk ODBC Connected?')
+#		
+#		com = Commands.AstCommand('odbc show all')
+#		rez = com.execute(0)
+#		lines = rez.split('\n')
+#		bottomLine = lines.pop()
+#		while bottomLine is "":
+#			bottomLine = lines.pop()
+#		content = bottomLine.split(' ')	
+#		numConnections = 0
+#		for ii, elem in enumerate(content):
+#			if elem == 'connections:':
+#				numConnections = int(content[ii+1])
+#				break
+#		self.assertTrue(numConnections)	
 
 	def test_loaded_codecs(self):
 		# alert the user of the current test
@@ -111,11 +111,14 @@ class AsteriskTests(unittest.TestCase):
 	
 		com = Commands.AstCommand('core show codecs')
 		rez = com.execute(0)
-		h264_index = rez.find('video h264') + 1 # returns -1 if not found
-		g722_index = rez.find('audio g722') + 1 # returns -1 if not found
-		status = h264_index and g722_index
+		status = True
+		for codec in self.configs["asterisk"]["codecs"]:
+			index = rez.find(codec["name"]) + 1 # returns -1 if not found 
+			if not index:
+				print('{} was not loaded'.format(codec["name"]))
+			status = status and index
 		self.assertTrue(status)
-
+		
 	def test_stun_server(self):
 		# alert the user of the current test
 		print ('\nTesting ---> Asterisk STUN Server?')
@@ -153,8 +156,13 @@ class AsteriskTests(unittest.TestCase):
 
 		com = Commands.AstCommand('module show')
 		rez = com.execute(0)
-		index = rez.find('res_pjsip.so') + 1 # returns -1 if not found
-		self.assertTrue(index)	
+		status = True
+		for module in self.configs["asterisk"]["modules"]:
+			index = rez.find(module["name"]) + 1 # returns -1 if not found 
+			if not index:
+				print('{} was not loaded'.format(module["name"]))
+			status = status and index
+		self.assertTrue(status)
 
 
 if __name__ == '__main__':
