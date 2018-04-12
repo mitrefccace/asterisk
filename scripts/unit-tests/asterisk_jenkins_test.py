@@ -2,7 +2,7 @@
 
 # Project : ACE Direct Automated Testing 
 # Author  : Connor McCann
-# Date    : 22 Feb 2018
+# Date    : 12 Apr 2018
 # Purpose : to provide a unit test for Asterisk
 
 import commands as Commands
@@ -31,6 +31,7 @@ class AsteriskTests(unittest.TestCase):
 			cls.configFile = Utilities.find_file('asterisk_test_config.json')
 			with open(cls.configFile, 'r') as f:
 				cls.configs = json.load(f)
+			time.sleep(5) # trying to see if this helps pass jenkins pipeline
 							
 		except:
 			print('Error occured while setting up the test class ---> Aborting Test')
@@ -103,6 +104,17 @@ class AsteriskTests(unittest.TestCase):
 				numConnections = int(content[ii+1])
 				break
 		self.assertTrue(numConnections)	
+
+	def test_loaded_codecs(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Loaded Codecs?')
+	
+		com = Commands.AstCommand('core show codecs')
+		rez = com.execute(0)
+		h264_index = rez.find('video h264') + 1 # returns -1 if not found
+		g722_index = rez.find('audio g722') + 1 # returns -1 if not found
+		status = h264_index and g722_index
+		self.assertTrue(status)
 
 	def test_stun_server(self):
 		# alert the user of the current test
