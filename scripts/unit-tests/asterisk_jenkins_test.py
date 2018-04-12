@@ -86,6 +86,24 @@ class AsteriskTests(unittest.TestCase):
 					status = words[i+1].strip()
 		self.assertEqual(status, "Enabled")
 			
+	def test_odbc_connections(self):
+		# alert the user of the current test
+		print('\nTesting ---> Asterisk ODBC Connected?')
+		
+		com = Commands.AstCommand('odbc show all')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		bottomLine = lines.pop()
+		while bottomLine is "":
+			bottomLine = lines.pop()
+		content = bottomLine.split(' ')	
+		numConnections = 0
+		for ii, elem in enumerate(content):
+			if elem == 'connections:':
+				numConnections = int(content[ii+1])
+				break
+		self.assertTrue(numConnections)	
+
 	def test_stun_server(self):
 		# alert the user of the current test
 		print ('\nTesting ---> Asterisk STUN Server?')
@@ -116,6 +134,15 @@ class AsteriskTests(unittest.TestCase):
 				queue = line.split(' ')[0].strip()
 				queues.append(queue)
 		self.assertEqual(len(queues), self.configs["asterisk"]["num_queues"])
+
+	def test_loaded_modules(self):
+		# alert the user of the current test
+		print ('\nTesting ---> Asterisk Modules Loaded?')
+
+		com = Commands.AstCommand('module show')
+		rez = com.execute(0)
+		index = rez.find('res_pjsip.so') + 1 # returns -1 if not found
+		self.assertTrue(index)	
 
 
 if __name__ == '__main__':
