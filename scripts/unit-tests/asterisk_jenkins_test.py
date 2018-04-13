@@ -29,9 +29,12 @@ class AsteriskTests(unittest.TestCase):
 		try:
 			# load some values from JSON configuration 
 			cls.configFile = Utilities.find_file('asterisk_test_config.json')
+                        # Wait these many seconds. Needed because docker-entrypoint.sh takes some time
+                        seconds_wait = 15
 			with open(cls.configFile, 'r') as f:
 				cls.configs = json.load(f)
-			time.sleep(5) # trying to see if this helps pass jenkins pipeline
+			print('\nWaiting {} seconds before running unit tests..........'.format(seconds_wait))
+                        time.sleep(seconds_wait) # trying to see if this helps pass jenkins pipeline
 							
 		except:
 			print('Error occured while setting up the test class ---> Aborting Test')
