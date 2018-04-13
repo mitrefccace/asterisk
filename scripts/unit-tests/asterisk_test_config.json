@@ -2,7 +2,7 @@
 	"asterisk": {
 		"stun": "stun.task3acrdemo.com",
 		"num_queues": 3,
-		"num_endpoints": 14,
+		"num_endpoints": 39,
 		"num_db_entries": 7,
 		"modules": [
 			{"name": "res_http_websocket.so"},

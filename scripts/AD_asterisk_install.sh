@@ -18,7 +18,7 @@ INPUT=.config
 HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
 
 # This flag is used to install Asterisk in relation to 
-CI_MODE=false
+DOCKER_MODE=false
 
 print_message() {
         # first argument is the type of message
@@ -83,8 +83,8 @@ echo "============================================================"
 while true
 do
 	case "$1" in
-		--ci-mode)
-			CI_MODE=true
+		--docker-mode)
+			DOCKER_MODE=true
 			shift;;
 		"") break;;
                 *)
@@ -93,12 +93,12 @@ do
         esac
 done
 
-echo "CI MODE: $CI_MODE"
+echo "CI MODE: $DOCKER_MODE"
 
-# If CI_MODE is enabled, these will append flags to build_pjproject and 
+# If DOCKER_MODE is enabled, these will append flags to build_pjproject and 
 # update_asterisk to prevent functionality that is needed when asterisk
 # is running during Docker builds
-if $CI_MODE; then
+if $DOCKER_MODE; then
 	BUILD_PJ_ARG="--no-restart"
 	UPDATE_AST_ARG="--no-db"
 else
@@ -107,7 +107,7 @@ fi
 
 #check for IPv6 and SElinux (skipped in CI MODE)
 
-if [ ! CI_MODE ]; then
+if [ ! DOCKER_MODE ]; then
 
 	DISABLED="disabled"
 	SESTATUS=$(sestatus | head -1 | awk '{print $3}')
@@ -182,7 +182,7 @@ echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
 
 
 # skip the self-signed cert creating in CI MODE
-if [ ! CI_MODE ]; then
+if [ ! DOCKER_MODE ]; then
 
 	echo "Generating the Asterisk self-signed certificates. You will be prompted to enter a password or passphrase for the private key."
 	sleep 2
@@ -190,6 +190,19 @@ if [ ! CI_MODE ]; then
 	#generate TIS certificates
 	/usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 
+else
+	mkdir -p /etc/asterisk/keys && cd /etc/asterisk/keys
+	# Create Root/CA cert
+	openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 365 -subj "/C=US/ST=Virginia/L=McLean/O=MITRE/OU=ACE Direct/CN=$HOSTNAME"  -passout pass:test
+	# Create client private key
+	openssl genrsa -out asterisk.key 2048
+	# Create client CSR
+	openssl req -new -key asterisk.key -out asterisk.csr -subj "/C=US/ST=Virginia/L=McLean/O=MITRE/OU=ACE Direct/CN=34.224.77.244"
+	# Sign client CSR and create client public key
+	openssl x509 -req -in asterisk.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out asterisk.crt -days 500 -sha256 -passin pass:test
+	# asterisk.pem is the combination of both the private and public client keys
+	cat asterisk.key > asterisk.pem
+	cat asterisk.crt >> asterisk.pem
 fi
 
 repo=$(dirname $startPath)
@@ -201,7 +214,7 @@ yes | cp -rf scripts/itrslookup.sh /var/lib/asterisk/agi-bin
 chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 
 #modify configs with named params and populate AstDB if
-#not in CI_MODE
+#not in DOCKER_MODE
 
 cd $startPath
 ./update_asterisk.sh --config --media $UPDATE_AST_ARG

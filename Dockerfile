@@ -18,39 +18,36 @@ WORKDIR /root
 COPY . asterisk-codev/
 WORKDIR asterisk-codev/scripts/
 
-# Set the proxy, and prepare .config
-RUN export https_proxy=$http_proxy
-RUN export IP_ADDR=$(hostname -I | awk "{print $1}") && \
-		sed -i -e "s/192.168.0.1/$IP_ADDR/g" .config.sample && \
-		sed -i -e "s/8.8.8.8/$IP_ADDR/g" .config.sample && \
-		sed -i -e "s/stun.example.com/stun.task3acrdemo.com/g" .config.sample && \
-		sed -i -e "s/hostname/ace-direct-mysql.ceq7afndeyku.us-east-1.rds.amazonaws.com/g" .config.sample && \
-		sed -i -e "s/database/asterisk/g" .config.sample && \
-		sed -i -e "s/table/vasip/g" .config.sample && \
-		sed -i -e "s/somePass/2tZTp&b49#TSFYc2/g" .config.sample && \
-		mv .config.sample .config 
-
 # Set the proxy for yum and git. We specifically need to
 # run git config because build_pjproject runs a 'git clone'
 # to pull down the asterisk third-party package. (don't know why we need
 # to set git config, should pick up http_proxy envt var.........)
-RUN echo "proxy=$http_proxy" >> /etc/yum.conf
+RUN export https_proxy=$http_proxy &&  echo "proxy=$http_proxy" >> /etc/yum.conf
 # The MITRE & ECE proxies don't play well with the CentOS mirrors,
 # so we'll use the base URL instead
 RUN sed -i -e 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Base.repo && \
-	sed -i -e 's/#baseurl/baseurl/g' /etc/yum.repos.d/CentOS-Base.repo && \
-	sed -i -e 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.conf
+        sed -i -e 's/#baseurl/baseurl/g' /etc/yum.repos.d/CentOS-Base.repo && \
+        sed -i -e 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.conf
 
 RUN yum install -y git && git config --global http.proxy $http_proxy
 
+# If we're in CI_MODE, prepare .config. Otherwise, this will be handled in
+# docker-entrypoint.sh
+RUN if [ -n CI_MODE ]; then export IP_ADDR=$(hostname -I | awk "{print $1}") && \
+        sed -i -e "s/192.168.0.1/$IP_ADDR/g" .config.sample && \
+        sed -i -e "s/8.8.8.8/$IP_ADDR/g" .config.sample && \
+        sed -i -e "s/stun.example.com/stun.task3acrdemo.com/g" .config.sample && \
+        sed -i -e "s/hostname/ace-direct-mysql.ceq7afndeyku.us-east-1.rds.amazonaws.com/g" .config.sample && \
+        sed -i -e "s/database/asterisk/g" .config.sample && \
+        sed -i -e "s/table/vasip/g" .config.sample && \
+        sed -i -e "s/somePass/2tZTp&b49#TSFYc2/g" .config.sample && \
+        mv .config.sample .config ; fi
 
 # need to set the #TERM var for the script log messages
 RUN export $TERM=xterm
 	
 # Run the install script
-RUN ./AD_asterisk_install.sh --ci-mode
-
-WORKDIR /
+RUN ./AD_asterisk_install.sh --docker-mode
 
 # Run asterisk in the foreground
 ENTRYPOINT ["/root/asterisk-codev/scripts/docker-entrypoint.sh"]
