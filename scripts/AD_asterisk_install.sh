@@ -180,8 +180,8 @@ cd $startPath
 echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
 /sbin/ldconfig
 
-
-# skip the self-signed cert creating in CI MODE
+# If we're in Docker mode, we'll generate custom self-signed certs. Otherwise, we'll use the Asterisk-provided
+# cert generation script, which prompts the user to enter a custom passphrase for the root private key.
 if [ ! DOCKER_MODE ]; then
 
 	echo "Generating the Asterisk self-signed certificates. You will be prompted to enter a password or passphrase for the private key."
@@ -197,7 +197,7 @@ else
 	# Create client private key
 	openssl genrsa -out asterisk.key 2048
 	# Create client CSR
-	openssl req -new -key asterisk.key -out asterisk.csr -subj "/C=US/ST=Virginia/L=McLean/O=MITRE/OU=ACE Direct/CN=34.224.77.244"
+	openssl req -new -key asterisk.key -out asterisk.csr -subj "/C=US/ST=Virginia/L=McLean/O=MITRE/OU=ACE Direct/CN=$PUBLIC_IP"
 	# Sign client CSR and create client public key
 	openssl x509 -req -in asterisk.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out asterisk.crt -days 500 -sha256 -passin pass:test
 	# asterisk.pem is the combination of both the private and public client keys
