@@ -72,7 +72,7 @@ function error_check_args {
 	restartArg=false
         cliArg=false
         phoneNum=""	
-	version=""
+	version="15.3.0"
 	done= false
 
 	while [ !done ]
@@ -137,15 +137,23 @@ function error_check_args {
                 esac
         done
 
-	# print setting to user
+	# print settings to user
+	no_db=true
+	if [[ $db == true ]]; then
+		no_db=false
+	fi
+	no_build=true
+	if [[ $build == true ]]; then
+		no_build=false
+	fi
 	echo "---------------------------------"
 	echo "patch    : ${patch}"
 	echo "config   : ${config}"
 	echo "media    : ${media}"
 	echo "backup   : ${backup}"
-	echo "no-db    : ${db}"
+	echo "no-db    : ${no_db}"
 	echo "version  : ${version}"
-	echo "no-build : ${build}"
+	echo "no-build : ${no_build}"
 	echo "restart  : ${restartArg}"
 	echo "cli      : ${cliArg}"
 	echo "dialin   : ${phoneNum}"
@@ -277,12 +285,6 @@ function apply_asterisk_patches {
 	fi
 	# find the location of Asterisk 15.1.2
         versionNum=$2
-	if [[ $versionNum == "" ]]; then
-		#printf "Please enter an Asterisk version number: "
-		#read versionNum
-		versionNum="15.3.0"
-	fi
-
 	asteriskPath=$(find / -type d -name "asterisk-${versionNum}")
 	#dirName="asterisk-${versionNum}"
 	#asteriskPath=$(find_dir $dirName)
