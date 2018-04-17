@@ -15,8 +15,8 @@ FROM centos:latest
 WORKDIR /root
 
 # Move the repo code to the container
-COPY . asterisk-codev/
-WORKDIR asterisk-codev/scripts/
+COPY . asterisk-ad/
+WORKDIR asterisk-ad/scripts/
 
 # Set the proxy for yum and git. We specifically need to
 # run git config because build_pjproject runs a 'git clone'
@@ -50,5 +50,5 @@ RUN export $TERM=xterm
 RUN ./AD_asterisk_install.sh --docker-mode
 
 # Run asterisk in the foreground
-ENTRYPOINT ["/root/asterisk-codev/scripts/docker-entrypoint.sh"]
+ENTRYPOINT ["/root/asterisk-ad/scripts/docker-entrypoint.sh"]
 #CMD asterisk && sleep 5 && /root/asterisk-codev/scripts/docker-entrypoint.sh && asterisk -r

@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Test') { 
             steps {
-                sh 'python /root/asterisk-codev/scripts/unit-tests/asterisk_jenkins_test.py' 
+                sh 'python /root/asterisk-ad/scripts/unit-tests/asterisk_jenkins_test.py' 
             }
         }
     }
