@@ -43,11 +43,28 @@ class AsteriskTests(unittest.TestCase):
 	def test_ast_service_down(self):
 		# alert the user of the current test
 		print('\nTesting ---> Asterisk Service Up?')
+		
 		com = Commands.OsCommand('service asterisk status')
 		rez = com.execute(0)
-		index = rez.find('running') + 1# returns -1 if substr not found
+		index = rez.find('running') + 1 # returns -1 if substr not found
 		self.assertTrue(index)
 	
+	def test_ast_version(self):
+		# alert the user of the current test
+		print('\nTesting ---> Asterisk Version Up-To-Date?')
+		
+		com = Commands.AstCommand('core show version')
+		rez = com.execute(0)
+		lines = rez.split('\n')
+		line = lines.pop()
+		while line is "":
+			line = lines.pop()
+		elems = line.split(' ')
+		version = ""
+		if elems[0] == 'Asterisk':
+			version = elems[1]
+		self.assertEqual(version, self.configs['asterisk']['version'])	
+
 	def test_pjsip_endpoints(self):
 		# alert the user of the current test
 		print ('\nTesting ---> PJSIP Endpoints Loaded?')
@@ -115,10 +132,10 @@ class AsteriskTests(unittest.TestCase):
 		com = Commands.AstCommand('core show codecs')
 		rez = com.execute(0)
 		status = True
-		for codec in self.configs["asterisk"]["codecs"]:
+		for codec in self.configs['asterisk']['codecs']:
 			index = rez.find(codec["name"]) + 1 # returns -1 if not found 
 			if not index:
-				print('{} was not loaded'.format(codec["name"]))
+				print('{} was not loaded'.format(codec['name']))
 			status = status and index
 		self.assertTrue(status)
 		
@@ -133,7 +150,7 @@ class AsteriskTests(unittest.TestCase):
 		while stunLine is "":
 			stunLine = lines.pop()
 		stun = stunLine.split(' ')[0].strip()
-		self.assertEqual(stun, self.configs["asterisk"]["stun"])		
+		self.assertEqual(stun, self.configs['asterisk']['stun'])		
 
 	def test_queues(self):
 		# alert the user of the current test
@@ -151,7 +168,7 @@ class AsteriskTests(unittest.TestCase):
 			if position > 0:
 				queue = line.split(' ')[0].strip()
 				queues.append(queue)
-		self.assertEqual(len(queues), self.configs["asterisk"]["num_queues"])
+		self.assertEqual(len(queues), self.configs['asterisk']['num_queues'])
 
 	def test_loaded_modules(self):
 		# alert the user of the current test
@@ -160,10 +177,10 @@ class AsteriskTests(unittest.TestCase):
 		com = Commands.AstCommand('module show')
 		rez = com.execute(0)
 		status = True
-		for module in self.configs["asterisk"]["modules"]:
-			index = rez.find(module["name"]) + 1 # returns -1 if not found 
+		for module in self.configs['asterisk']['modules']:
+			index = rez.find(module['name']) + 1 # returns -1 if not found 
 			if not index:
-				print('{} was not loaded'.format(module["name"]))
+				print('{} was not loaded'.format(module['name']))
 			status = status and index
 		self.assertTrue(status)
 

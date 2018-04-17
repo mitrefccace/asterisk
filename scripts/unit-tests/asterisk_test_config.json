@@ -1,5 +1,6 @@
 {
 	"asterisk": {
+		"version": "15.3.0",
 		"stun": "stun.task3acrdemo.com",
 		"num_queues": 3,
 		"num_endpoints": 39,
