@@ -101,7 +101,7 @@ echo "CI MODE: $DOCKER_MODE"
 # If DOCKER_MODE is enabled, these will append flags to build_pjproject and 
 # update_asterisk to prevent functionality that is needed when asterisk
 # is running during Docker builds
-if $DOCKER_MODE; then
+if [ $DOCKER_MODE=="true" ]; then
 	BUILD_PJ_ARG="--no-restart"
 	UPDATE_AST_ARG="--no-db"
 else
@@ -110,7 +110,7 @@ fi
 
 #check for IPv6 and SElinux (skipped in CI MODE)
 
-if [ ! DOCKER_MODE ]; then
+if [ $DOCKER_MODE=="false" ]; then
 
 	DISABLED="disabled"
 	SESTATUS=$(sestatus | head -1 | awk '{print $3}')
@@ -199,29 +199,16 @@ cd $startPath
 echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
 /sbin/ldconfig
 
-# If we're in Docker mode, we'll generate custom self-signed certs. Otherwise, we'll use the Asterisk-provided
-# cert generation script, which prompts the user to enter a custom passphrase for the root private key.
-if [ ! DOCKER_MODE ]; then
+# If we're NOT in Docker mode, we'll use the Asterisk-provided cert generation script,
+# which prompts the user to enter a custom passphrase for the root private key.
+# Otherwise, these certs will be generated in docker-entrypoint.sh
+if [ $DOCKER_MODE=="false" ]; then
 
 	echo "Generating the Asterisk self-signed certificates. You will be prompted to enter a password or passphrase for the private key."
 	sleep 2
 
-	#generate TIS certificates
-	     /usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
-
-else
-	mkdir -p /etc/asterisk/keys && cd /etc/asterisk/keys
-	# Create Root/CA cert
-	openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 365 -subj "/C=US/ST=Virginia/L=McLean/O=MITRE/OU=ACE Direct/CN=$HOSTNAME"  -passout pass:test
-	# Create client private key
-	openssl genrsa -out asterisk.key 2048
-	# Create client CSR
-	openssl req -new -key asterisk.key -out asterisk.csr -subj "/C=US/ST=Virginia/L=McLean/O=MITRE/OU=ACE Direct/CN=$PUBLIC_IP"
-	# Sign client CSR and create client public key
-	openssl x509 -req -in asterisk.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out asterisk.crt -days 500 -sha256 -passin pass:test
-	# asterisk.pem is the combination of both the private and public client keys
-	cat asterisk.key > asterisk.pem
-	cat asterisk.crt >> asterisk.pem
+	#generate TLS certificates
+	/usr/src/asterisk-$AST_VERSION/contrib/scripts/ast_tls_cert -C $PUBLIC_IP -O "ACE Direct" -d /etc/asterisk/keys
 fi
 
 repo=$(dirname $startPath)

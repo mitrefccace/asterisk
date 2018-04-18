@@ -25,6 +25,21 @@ if [ -z $CI_MODE ]; then
         ./update_asterisk.sh --config --no-db
 fi
 
+# If we're in Docker mode, we'll generate custom self-signed certs.
+mkdir -p /etc/asterisk/keys && cd /etc/asterisk/keys
+# Create Root/CA cert
+openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 365 -subj "/C=US/ST=Virginia/L=McLean/O=MITRE/OU=ACE Direct/CN=$HOSTNAME"  -passout pass:test
+# Create client private key
+openssl genrsa -out asterisk.key 2048
+# Create client CSR
+openssl req -new -key asterisk.key -out asterisk.csr -subj "/C=US/ST=Virginia/L=McLean/O=MITRE/OU=ACE Direct/CN=$PUBLIC_IP"
+# Sign client CSR and create client public key
+openssl x509 -req -in asterisk.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out asterisk.crt -days 500 -sha256 -passin pass:test
+# asterisk.pem is the combination of both the private and public client keys
+cat asterisk.key > asterisk.pem
+cat asterisk.crt >> asterisk.pem
+
+
 asterisk
 sleep 5
 asterisk -rx "database put GLOBAL DIALIN 1234567890"
