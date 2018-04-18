@@ -20,9 +20,6 @@ instLoc=/usr/src/
 #Hostname command suggestion
 HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
 
-# This flag is used to install Asterisk in relation to 
-DOCKER_MODE=false
-
 print_message() {
         # first argument is the type of message
         # (Error, Notify, Warning, Success)
@@ -96,21 +93,20 @@ do
         esac
 done
 
-echo "CI MODE: $DOCKER_MODE"
-
 # If DOCKER_MODE is enabled, these will append flags to build_pjproject and 
 # update_asterisk to prevent functionality that is needed when asterisk
 # is running during Docker builds
-if [ $DOCKER_MODE=="true" ]; then
+if [ -n "$DOCKER_MODE" ]; then
+	echo "DOCKER MODE ENABLED"
 	BUILD_PJ_ARG="--no-restart"
 	UPDATE_AST_ARG="--no-db"
 else
 	UPDATE_AST_ARG="--restart"
 fi
 
-#check for IPv6 and SElinux (skipped in CI MODE)
+#check for IPv6 and SElinux (skipped in DOCKER MODE)
 
-if [ $DOCKER_MODE=="false" ]; then
+if [ -z "$DOCKER_MODE" ]; then
 
 	DISABLED="disabled"
 	SESTATUS=$(sestatus | head -1 | awk '{print $3}')
@@ -202,7 +198,7 @@ echo “/usr/local/lib” > /etc/ld.so.conf.d/usr_local.conf
 # If we're NOT in Docker mode, we'll use the Asterisk-provided cert generation script,
 # which prompts the user to enter a custom passphrase for the root private key.
 # Otherwise, these certs will be generated in docker-entrypoint.sh
-if [ $DOCKER_MODE=="false" ]; then
+if [ -z "$DOCKER_MODE" ]; then
 
 	echo "Generating the Asterisk self-signed certificates. You will be prompted to enter a password or passphrase for the private key."
 	sleep 2
