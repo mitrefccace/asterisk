@@ -7,9 +7,11 @@
 
 # When we're not in CI mode, the below envt vars must be passed
 # to the container at run time.
+
+cd /root/asterisk-ad/scripts
+
 if [ -z $CI_MODE ]; then
         echo "CI mode NOT detected, setting .config via run-time envt variables."
-        cd /root/asterisk-codev/scripts
         LOCAL_IP=$(hostname -I) | awk '{print $1}'
         HOSTNAME=$(hostname)
         sed -i -e "s/HOSTNAME/$HOSTNAME/g" .config.sample
@@ -24,6 +26,7 @@ if [ -z $CI_MODE ]; then
         mv .config.sample .config
         
 fi
+
 # We need to run this regardless of CI_MODE
 ./update_asterisk.sh --config --no-db
 
