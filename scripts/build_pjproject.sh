@@ -89,7 +89,7 @@ function error_check_args {
 	echo "Rebuild Asterisk   :  ${build}"
 	echo "Remove Artifacts   :  ${clean}"
 	echo "-----------------------------------"
-	main $astVersion $pjVersion $build $clean
+	main $astVersion $pjVersion $build $clean $restartAst
 }
 
 
@@ -120,6 +120,7 @@ function main {
 	pjVersion=$2
 	buildAst=$3
 	removeArtifacts=$4
+	restartAst=$5
 	
 	# note our current dir location
 	startPath=$(pwd)
