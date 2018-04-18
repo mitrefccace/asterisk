@@ -171,10 +171,10 @@ function error_check_args {
 	fi
 	# run installation function
         if [[ $config == "true" ]]; then
-		install_configs $backup 
+		install_configs $backup $db
 	fi
 	if [[ $media == "true" ]]; then
-		install_media $backup
+		install_media $backup 
 	fi
 	# handle any remaingin arg commands
 	execute_args $restartArg $cliArg 
@@ -410,14 +410,18 @@ function install_configs {
 		exit 1
 	fi
 	
-	# alert user of the asterisk dialin number
-	dialin=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
-	rez=$(error_check_num $dialin)
-	if [ $rez == "pass" ]; then
-		print_message "Notify" "this machine's dialin number has been detected ---> ${dialin}"
-	else
-		print_message "Error" "the Asterisk database does not contain a dialin number ---> Installation Canceled"
-		exit 1
+	db=$2
+
+	if [[ $db == "true" ]]; then
+		# alert user of the asterisk dialin number
+		dialin=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
+		rez=$(error_check_num $dialin)
+		if [ $rez == "pass" ]; then
+			print_message "Notify" "this machine's dialin number has been detected ---> ${dialin}"
+		else
+			print_message "Error" "the Asterisk database does not contain a dialin number ---> Installation Canceled"
+			exit 1
+		fi
 	fi
 	
 	# move odbc.ini.sample to /etc. 
