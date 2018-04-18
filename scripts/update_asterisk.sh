@@ -412,7 +412,7 @@ function install_configs {
 	
 	db=$2
 
-	if [[ $db=="true" ]]; then
+	if [[ $db == "true" ]]; then
 		# alert user of the asterisk dialin number
 		dialin=$(execute_asterisk_command "database get GLOBAL DIALIN" | cut -d ' ' -f 2)
 		rez=$(error_check_num $dialin)
