@@ -34,10 +34,11 @@ RUN yum install -y git && git config --global http.proxy $http_proxy
 # If we're in CI_MODE, prepare .config. Otherwise, this will be handled in
 # docker-entrypoint.sh
 RUN if [ -n CI_MODE ]; then export IP_ADDR=$(hostname -I | awk "{print $1}") && \
+	sed -i -e "s/HOSTNAME/jenkins.task3acrdemo.com/g" .config.sample && \
         sed -i -e "s/192.168.0.1/$IP_ADDR/g" .config.sample && \
         sed -i -e "s/8.8.8.8/$IP_ADDR/g" .config.sample && \
         sed -i -e "s/stun.example.com/stun.task3acrdemo.com/g" .config.sample && \
-        sed -i -e "s/hostname/ace-direct-mysql.ceq7afndeyku.us-east-1.rds.amazonaws.com/g" .config.sample && \
+        sed -i -e "s/db_hostname/ace-direct-mysql.ceq7afndeyku.us-east-1.rds.amazonaws.com/g" .config.sample && \
         sed -i -e "s/database/asterisk/g" .config.sample && \
         sed -i -e "s/table/vasip/g" .config.sample && \
         sed -i -e "s/somePass/2tZTp&b49#TSFYc2/g" .config.sample && \

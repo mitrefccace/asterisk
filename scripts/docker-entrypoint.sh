@@ -12,11 +12,11 @@ if [ -z $CI_MODE ]; then
         cd /root/asterisk-codev/scripts
         LOCAL_IP=$(hostname -I) | awk '{print $1}'
         HOSTNAME=$(hostname)
-        sed -i -e "s/hostname/$HOSTNAME/g" .config.sample
+        sed -i -e "s/HOSTNAME/$HOSTNAME/g" .config.sample
         sed -i -e "s/192.168.0.1/$LOCAL_IP/g" .config.sample
         sed -i -e "s/8.8.8.8/$PUBLIC_IP/g" .config.sample
         sed -i -e "s/stun.example.com/$STUN_ADDR/g" .config.sample
-        sed -i -e "s/hostname/$MYSQL_HOST/g" .config.sample
+        sed -i -e "s/db_hostname/$MYSQL_HOST/g" .config.sample
         sed -i -e "s/database/$MYSQL_DB/g" .config.sample
         sed -i -e "s/table/$MYSQL_TABLE/g" .config.sample
         sed -i -e "s/asterisk/$MYSQL_USER/g" .config.sample
