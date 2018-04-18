@@ -101,7 +101,7 @@ if [ -n "$DOCKER_MODE" ]; then
 	BUILD_PJ_ARG="--no-restart"
 	UPDATE_AST_ARG="--no-db"
 else
-	UPDATE_AST_ARG="--restart"
+	UPDATE_AST_ARG="--config --restart"
 fi
 
 #check for IPv6 and SElinux (skipped in DOCKER MODE)
@@ -219,7 +219,7 @@ chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 #not in DOCKER_MODE
 
 cd $startPath
-./update_asterisk.sh --config --media $UPDATE_AST_ARG
+./update_asterisk.sh --media $UPDATE_AST_ARG
 
 echo ""
 echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"
