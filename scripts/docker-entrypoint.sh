@@ -22,8 +22,10 @@ if [ -z $CI_MODE ]; then
         sed -i -e "s/asterisk/$MYSQL_USER/g" .config.sample
         sed -i -e "s/somePass/$MYSQL_PASS/g" .config.sample
         mv .config.sample .config
-        ./update_asterisk.sh --config --no-db
+        
 fi
+# We need to run this regardless of CI_MODE
+./update_asterisk.sh --config --no-db
 
 # If we're in Docker mode, we'll generate custom self-signed certs.
 mkdir -p /etc/asterisk/keys && cd /etc/asterisk/keys
