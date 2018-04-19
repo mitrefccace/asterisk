@@ -16,6 +16,16 @@ Within the 'scripts' directory, there are scripts that will automate the install
 pull down the configuration and media files from this repository and move them into their appropriate locations.  View the README in the 'scripts'
 directory for more information. It is HIGHLY recommended to use the install and update scripts to manage Asterisk for ACE Direct, as manual installations are officially unsupported by the ACE Direct project.
 
+## Jenkins CI/CD Service
+This repository has been setup and linked to our Jenkins EC2 instance within AWS. This allows us to leverage BitBucket WebHook plugins which can automatically detect when a new Pull request (PR) has been created. When a new PR is generated, the source branch will undergo a Jenkins build. This build or Pipeline will execute the following:
+1. Executes the Jenkinsfile (located in the root of this repository)
+2. Pulls down the latest source code for the originating branch 
+3. Builds the Docker Image using the Dockerfile (located in the root of this repository)
+4. Launches this Image as a containerized instance of Asterisk 
+5. Executes the Unit Test for Asterisk 
+6. Posts the Test results back to BitBucket
+
+If the **Build** and **Test** stages of the Jenkin Pipeline passed successfully, then status indicator next to the last commit of the PR will be green. If it failed any of the stages, the icon will be red. The PR should only be approved and merged if it has been marked green by Jenkins. 
 
 ## Modules
 
