@@ -19,15 +19,15 @@ directory for more information. It is HIGHLY recommended to use the install and 
 ## Jenkins CI/CD Service
 This repository has been setup and linked to our Jenkins EC2 instance within AWS. This allows us to leverage BitBucket WebHook plugins which can automatically detect when a new Pull request (PR) has been created. When a new PR is generated, the source branch will undergo a Jenkins build. This build or Pipeline will execute the following:
 1. Executes the Jenkinsfile (located in the root of this repository)
-2. Pulls down the latest source code for the originating branch 
+2. Pulls down the latest source code from the originating branch 
 3. Builds the Docker Image using the Dockerfile (located in the root of this repository)
 4. Launches this Image as a containerized instance of Asterisk 
 5. Executes the Unit Test for Asterisk 
 6. Posts the Test results back to BitBucket
 
-If the Build and Test stages of the Jenkin Pipeline passed successfully, then status indicator next to the last commit of the PR will be green. If it failed any of the stages, the icon will be red. The PR should only be approved and merged if it has been marked green by Jenkins. 
+If the Build and Test stages of the Jenkins Pipeline pass successfully, then the status indicator next to the last commit of the PR will be green. If it failed any of the stages, the icon will be red. The PR should only be approved and merged if it has been marked green by Jenkins. 
 
-**DISCLAIMER** -- *This Docker Image for Asterisk is NOT production ready and should ONLY be used for the Jenkins Pipeline.*
+**DISCLAIMER** -- *This Docker Image for Asterisk is NOT production ready and should ONLY be used within the Jenkins Pipeline.*
 
 ## Modules
 
