@@ -25,7 +25,9 @@ This repository has been setup and linked to our Jenkins EC2 instance within AWS
 5. Executes the Unit Test for Asterisk 
 6. Posts the Test results back to BitBucket
 
-If the **Build** and **Test** stages of the Jenkin Pipeline passed successfully, then status indicator next to the last commit of the PR will be green. If it failed any of the stages, the icon will be red. The PR should only be approved and merged if it has been marked green by Jenkins. 
+If the Build and Test stages of the Jenkin Pipeline passed successfully, then status indicator next to the last commit of the PR will be green. If it failed any of the stages, the icon will be red. The PR should only be approved and merged if it has been marked green by Jenkins. 
+
+**DISCLAIMER** -- *This Docker Image for Asterisk is NOT production ready and should ONLY be used for the Jenkins Pipeline.*
 
 ## Modules
 
