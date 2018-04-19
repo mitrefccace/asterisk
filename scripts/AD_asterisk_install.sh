@@ -159,7 +159,7 @@ fi
 echo "Installing pre-requisite packages for Asterisk and PJPROJECT"
 yum -y install --skip-broken epel-release bzip2 dmidecode gcc-c++ ncurses-devel libxml2-devel make wget net-tools telnet vim zip unzip openssl-devel newt-devel kernel-devel libuuid-devel gtk2-devel jansson-devel binutils-devel git libsrtp libsrtp-devel unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel mysql-connector-odbc tcpdump patch sqlite bind-utils
 
-if [ -n $(grep "Red Hat" /etc/redhat-release) ]
+if [ $(grep "Red Hat" /etc/redhat-release) ]
 then
 	echo "RedHat ha been detected, manually installing libjansson and libsrtp-devel"
 	cd $instLoc
