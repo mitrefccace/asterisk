@@ -20,6 +20,12 @@ instLoc=/usr/src/
 #Hostname command suggestion
 HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
 
+#Param to be set if Amazon Linux is detected
+AMZN=''
+
+#File to be touched if Amazon Linux is detected
+RH_RELEASE=/etc/redhat-release
+
 print_message() {
         # first argument is the type of message
         # (Error, Notify, Warning, Success)
@@ -161,7 +167,7 @@ yum -y install --skip-broken epel-release bzip2 dmidecode gcc-c++ ncurses-devel 
 
 if [ $(grep "Red Hat" /etc/redhat-release) ]
 then
-	echo "RedHat ha been detected, manually installing libjansson and libsrtp-devel"
+	echo "RedHat has been detected, manually installing libjansson and libsrtp-devel"
 	cd $instLoc
 	# Manually install libjansson
 	wget http://www.digip.org/jansson/releases/jansson-2.11.tar.gz 
@@ -174,6 +180,18 @@ then
 	wget http://mirror.centos.org/centos/7/os/x86_64/Packages/libsrtp-devel-1.4.4-10.20101004cvs.el7.x86_64.rpm
 	yum localinstall --nogpgcheck libsrtp-devel-1.4.4-10.20101004cvs.el7.x86_64.rpm -y
 fi
+
+# For Amazon Linux, we need to mock the /etc/redhat-release file
+# so that the install_prereq and configure scripts install/check
+# for the proper system packages. This works because Amazon Linux
+# is a RHEL derivative.
+if [ $(grep "Amazon Linux" /etc/redhat-release) ]
+then
+	echo "Amazon Linux has been detected, touching /etc/redhat-release file."
+	AMZN=true
+	touch $RH_RELEASE
+fi
+
 
 #download Asterisk
 cd $instLoc
@@ -220,6 +238,11 @@ chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 
 cd $startPath
 ./update_asterisk.sh --media $UPDATE_AST_ARG
+
+if [ -n $AMZN ]
+then
+	rm -f $RH_RELEASE
+fi
 
 echo ""
 echo "NOTE: the user passwords in pjsip.conf and the Asterisk Manager Interface"
