@@ -185,7 +185,7 @@ fi
 # so that the install_prereq and configure scripts install/check
 # for the proper system packages. This works because Amazon Linux
 # is a RHEL derivative.
-if [ $(grep "Amazon Linux" /etc/redhat-release) ]
+if [ $(grep "Amazon Linux" /etc/system-release) ]
 then
 	echo "Amazon Linux has been detected, touching /etc/redhat-release file."
 	AMZN=true
