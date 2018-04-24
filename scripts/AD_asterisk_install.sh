@@ -239,7 +239,7 @@ chmod +x /var/lib/asterisk/agi-bin/itrslookup.sh
 cd $startPath
 ./update_asterisk.sh --media $UPDATE_AST_ARG
 
-if [ -n $AMZN ]
+if [ $AMZN == "true" ]
 then
 	rm -f $RH_RELEASE
 fi
