@@ -21,7 +21,7 @@ instLoc=/usr/src/
 HOST_SUGG="You can use 'sudo hostnamectl set-hostname <hostname>' to set the hostname."
 
 #Param to be set if Amazon Linux is detected
-AMZN=''
+AMZN='false'
 
 #File to be touched if Amazon Linux is detected
 RH_RELEASE=/etc/redhat-release
