@@ -26,7 +26,7 @@ docker build -t asterisk --build-arg http_proxy=<proxy url>
 When running the image in a container, there are a set of environment variables that must be set. In addition, you must have a MySQL and STUN instance (whether in containers or not) available.
 
 ```sh
-docker run asterisk --name asterisk -p 5060:5060 -p 5060:5060/udp 5553:53/udp -p 8090:443 -p 5038:5038 -p 10000-10010:10000-10010 -e PUBLIC_IP=<public ip address> -e SUTN_ADDR=<stun address> MYSQL_DB=<mysql address> MYSQL_TABLE=<mysql cdr table> MYSQL_USER=<mysql user> MYSQL_PASS=<mysql password> -v <SSL cert file>:/etc/asterisk/keys/star.pem -v <SSL key file>:/etc/asterisk/keys/star.key
+docker run --name asterisk -p 5060:5060 -p 5060:5060/udp 5553:53/udp -p 8090:443 -p 5038:5038 -p 10000-10010:10000-10010 -e PUBLIC_IP=<public ip address> -e SUTN_ADDR=<stun address> MYSQL_DB=<mysql address> MYSQL_TABLE=<mysql cdr table> MYSQL_USER=<mysql user> MYSQL_PASS=<mysql password> -v <SSL cert file>:/etc/asterisk/keys/star.pem -v <SSL key file>:/etc/asterisk/keys/star.key asterisk
 ```
 
 **DISCLAIMER** -- *This Docker Image for Asterisk is NOT production ready, and should ONLY be used for development purposes and/or within the Jenkins pipeline describled below.*
