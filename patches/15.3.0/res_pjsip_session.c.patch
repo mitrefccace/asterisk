@@ -1,0 +1,38 @@
+--- res_pjsip_session.c	2018-03-28 16:22:50.000000000 -0400
++++ res_pjsip_session.c.outboundFmtpConditional	2018-05-01 14:41:19.000000000 -0400
+@@ -1999,6 +1999,35 @@
+ 		return -1;
+ 	}
+ 
++        /* MITRE Mar26-2018: workaround to add a hardcoded fmtp line in the INVITE going to device
++           Assumption:
++                1. only video fmtp line is missing, which is in offer->media[1]
++                2. fmtp line is hardcoded from Chrome 65 - compatability needs to be checked with Chrome upgrade
++        */
++	/* MITRE May1-2018: add a condition to add fmtp line only if H264 in rtpmap line */
++
++
++        const pjmedia_sdp_attr *attr_fmtp;
++        const pjmedia_sdp_attr *attr_rtpmap;
++
++        attr_fmtp = pjmedia_sdp_media_find_attr2(offer->media[1], "fmtp", NULL);
++        attr_rtpmap = pjmedia_sdp_media_find_attr2(offer->media[1], "rtpmap", NULL);
++
++	if (attr_fmtp)
++		ast_log(LOG_NOTICE, "fmtp line: %s\n", attr_fmtp->value.ptr);
++	if (attr_rtpmap)
++		ast_log(LOG_NOTICE, "rtpmap line: %s\n", attr_rtpmap->value.ptr);
++
++        if (attr_rtpmap && strstr(attr_rtpmap->value.ptr, "H264") && !attr_fmtp) {
++                ast_log(LOG_NOTICE, "Media[1] is H264 and is missing fmtp line, adding hardcoded fmtp line\n");
++
++                const char *a_name_0 = "fmtp";
++                static const pj_str_t a_value_0 = {"99 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f", 73};
++                /* allocate memory on the pool for the new object */
++                pjmedia_sdp_attr *attr_0 = pjmedia_sdp_attr_create(session->inv_session->pool_prov, a_name_0, &a_value_0);
++                /* append the < pjmedia_sdp_attr > */
++                pjmedia_sdp_attr_add(&offer->media[1]->attr_count, offer->media[1]->attr, attr_0);
++        }
+ 	pjsip_inv_set_local_sdp(session->inv_session, offer);
+ 	pjmedia_sdp_neg_set_prefer_remote_codec_order(session->inv_session->neg, PJ_FALSE);
+ #ifdef PJMEDIA_SDP_NEG_ANSWER_MULTIPLE_CODECS
