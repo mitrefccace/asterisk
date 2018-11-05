@@ -73,9 +73,9 @@ function error_check_args {
         cliArg=false
         phoneNum=""	
 	version="15.3.0"
-	done= false
+	done=false
 
-	while [ !done ]
+	while [[ $done != true ]]
         do
 		case "$1" in
                         --help)
@@ -369,6 +369,8 @@ function install_media {
 		exit 1
 	fi
 
+	
+
 	mediaFiles=$(find ../media -name '*.*')
 	mediaDir=/var/lib/asterisk/sounds
 	mediaStatus=true
@@ -379,6 +381,24 @@ function install_media {
 	fi
 
 	echo "============================================================"
+	
+	# If there are any subdirs in media/, we need to copy the entire dir over
+	# we need to cut the first result (the media dir itself) via 'tail'
+	mediaSubDirs=$(find ../media -type d | tail -n +2)
+	for dir in $mediaSubDirs
+	do
+		cp -R $dir $mediaDir
+		if [[ $? == "0" ]]; then
+			print_message "Notify" "copied ${dir} ---> $mediaDir"
+		else
+			mediaStatus=false
+			print_message "Error" "failed to copy ${dir} ---> $mediaDir"
+		fi
+
+	
+	done
+
+	# Copy remaining files in media/ over
 	for file in $mediaFiles
 	do
 		yes | cp -rf $file $mediaDir 2>/dev/null

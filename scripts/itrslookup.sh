@@ -44,7 +44,9 @@ REVPHONENUM="`echo $PHONENUM|rev|sed 's/\(.\)/\1./g'`"
 ONE=1
 COMBINED=$REVPHONENUM$ONE
 
-SIPURI="`dig @$ITRSIP in naptr $COMBINED.itrs.us | grep "E2U+sip"|head| cut -f2 -d\@|cut -f1 -d\!`"
+#SIPURI="`dig @$ITRSIP in naptr $COMBINED.itrs.us | grep "E2U+sip"|head| cut -f2 -d\@|cut -f1 -d\!`"
+# Add capability of priority sorting and selection of the top result in multiple records --cchow_20180717
+SIPURI="`dig @$ITRSIP in naptr $COMBINED.itrs.us | grep "E2U+sip"|head| sort -n -k5 | awk NR==1 | cut -f2 -d\@| cut -f1 -d\!`"
 #SIPURI2="`host -t NAPTR $SIPURI| cut -f10 -d\ `"
 
 if [ "$2" == "simple" ]; then
@@ -63,8 +65,11 @@ if [ -z $SIPURI2 ]; then
 fi
 
 #exit 0
-SIPURI3="`host -t SRV $SIPURI2`"
-SIPPORT="`echo $SIPURI3| cut -f7 -d\ `"
+# Interop 2018/05 - Add sorting to include the priority consideration (this is reversed for sorenson, using lower priority one)
+#SIPURI3="`host -t SRV $SIPURI2 | sort -n -r -k2`"
+# Add capability of priority sorting (normal use case that picks the higher priority record) and selection of th top result in multiple record --cchow_20180717
+SIPURI3="`host -t SRV $SIPURI2 | sort -n -k2 | awk NR==1`"
+SIPPORT="`echo $SIPURI3| cut -f7 -d' '`"
 
 # Sorensen sometimes uses 50060 as their port. Since that's not open for us, we'll use 5060
 
@@ -73,7 +78,7 @@ if [ "$SIPPORT" == "50060" ]; then
 fi
 
 
-SIPHOST="`echo $SIPURI3| cut -f8 -d\ |rev|cut -c 2-|rev`"
+SIPHOST="`echo $SIPURI3| cut -f8 -d' '|rev|cut -c 2-|rev`"
 
 #loop through provider URIs, and set the Asterisk variable on the one that matches
 #the current phone number being queried
