@@ -54,8 +54,9 @@ if [ "$2" == "simple" ]; then
         exit 0
 fi
 
-
-SIPURI2="`host -t NAPTR $SIPURI|grep tcp|awk '{ print $NF }'`"
+# Add priority sorting and choosing the top result in multiple NAPTR records (AWS Route53) --cchow_20180913
+SIPURI2="`host -t NAPTR $SIPURI | sort -n -k2 | grep tcp | awk NR==1 | awk '{ print $NF }'`"
+#SIPURI2="`host -t NAPTR $SIPURI|grep tcp|awk '{ print $NF }'`"
 echo "SIP URI is $SIPURI"
 
 #if no NAPTR record exists for the SIP URI, we'll try to place a SIP call using port 5060
