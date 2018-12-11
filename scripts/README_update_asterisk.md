@@ -4,7 +4,7 @@
 -----------
 This repository contains all of the necessary files and scripts required to create and track the 
 most stable version of Asterisk and PJSIP. The configuration files are the primary source of 
-modifcation to the server and should be adjusted (external media address, local address, phone number) 
+modifcation to the server and should be adjusted (external media address, local address, proxy address, phone number) 
 for each new server instance and then placed within __/etc/asterisk/__. Additionally, patch files have 
 been included and can be applied if desired. An installation script has been included to assist with this process.
 

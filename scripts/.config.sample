@@ -1,6 +1,7 @@
 <hostname>,pjsip.conf,HOSTNAME,
 <local_ip>,pjsip.conf,192.168.0.1,
 <public_ip>,pjsip.conf,8.8.8.8,
+<kamailio_local_ip>,pjsip.conf,192.168.0.21,
 <stun_server>,rtp.conf|res_stun_monitor.conf,stun.example.com,
 <crt_file>,pjsip.conf|http.conf,\/etc\/asterisk\/keys\/asterisk.pem,
 <crt_key>,pjsip.conf|http.conf,\/etc\/asterisk\/keys\/asterisk.key,

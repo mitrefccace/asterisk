@@ -38,6 +38,7 @@ Before executing the install script, you MUST modify this file with the values f
 | <hostname>          | The domain name associated with the server.                                         |
 | <local_ip>          | The private/local IP address of the Asterisk.                                       |
 | <public_ip>         | The external.public IP address of the Asterisk server.                              |
+| <kamailio_local_ip> | The private/local IP address of the Proxy server.                                   |
 | <stun_server>       | STUN/TURN server address:port. We recommend building a dedicated STUN server, as public STUN servers can become congested and lead to higher latency for STUN/ICE. If you do not have one, a Google STUN server will be used in the config instead.|                                  
 | <crt_file>          | CA cert file for server. Generated self-signed cert is used if none is provided.    |
 | <crt_key>           | Private key for CA cert.                                                            |
