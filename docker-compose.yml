@@ -1,0 +1,31 @@
+# Usage:
+#
+# sudo docker-compose build
+# sudo docker-compose up
+#
+# Remember to setup "./.env" to match your needs prior to build.
+#
+#
+version: "2"
+services:
+    asterisk:
+        env_file: .env
+        image: "docker-asterisk:v1"
+        hostname: "ENTER HOSTNAME"
+        domainname: "ENTER DOMAIN NAME"
+        build:
+            dockerfile: Dockerfile
+            context: .
+            args:
+            - https_proxy=${https_proxy}
+            - http_proxy=${http_proxy}
+        ports:
+        - "443:443/tcp"
+        - "5060:5060/udp"
+        - "5060:5060/tcp"
+        - "5038:5038/tcp"
+        - "10000-10100:10000-10100/udp" 
+        restart: "no"
+        volumes:
+        - ./volumes/logs:/var/log/asterisk
+        - ./volumes/secrets/keys:/etc/asterisk/keys

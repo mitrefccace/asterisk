@@ -19,12 +19,17 @@
 
 # provider URIs
 CONVO="sbc.sip.convorelay.net"
+CONVO2="grouphead.dev.convorelay.net"
 PURPLE="vrs-bgw.prod.purple.us"
+PURPLE2="vrs-bgw.staging.purple.us"
+PURPLE3="vrs-bgw.test.purple.us"
 GLOBAL="globalvrs.tv"
+GLOBAL2="gvrs.nwise.se"
 SORENSON="p.ci.svrs.net"
 SORENSON2="p2.ci.svrs.net"
 SORENSONQA="p.ci-qa-a.svrs.net"
 ZVRS="sbc.prod.champvrs.com"
+ZVRS3="sbc.st.bestvrs.com"
 
 ITRSIP="156.154.59.67"
 PHONENUM=$1
@@ -77,6 +82,9 @@ SIPPORT="`echo $SIPURI3| cut -f7 -d' '`"
 if [ "$SIPPORT" == "50060" ]; then
         SIPPORT="5060"
 fi
+#if [ "$SIPPORT" == "15060" ]; then
+#        SIPPORT="5060"
+#fi
 
 
 SIPHOST="`echo $SIPURI3| cut -f8 -d' '|rev|cut -c 2-|rev`"
@@ -86,14 +94,24 @@ SIPHOST="`echo $SIPURI3| cut -f8 -d' '|rev|cut -c 2-|rev`"
 
 if [ $SIPHOST == $CONVO ]; then
         echo "SET VARIABLE endpoint Convo"
+elif [ $SIPHOST == $CONVO2 ]; then
+        echo "SET VARIABLE endpoint Convo2"
 elif [ $SIPHOST == $PURPLE ]; then
         echo "SET VARIABLE endpoint Purple"
+elif [ $SIPHOST == $PURPLE2 ]; then
+        echo "SET VARIABLE endpoint Purple2"
+elif [ $SIPHOST == $PURPLE3 ]; then
+        echo "SET VARIABLE endpoint PurpleDEV"
+elif [ $SIPHOST == $ZVRS3 ]; then
+        echo "SET VARIABLE endpoint ZVRS3"
 elif [ $SIPHOST == $GLOBAL ]; then
         echo "SET VARIABLE endpoint Global"
+elif [ $SIPHOST == $GLOBAL2 ]; then
+        echo "SET VARIABLE endpoint Global2"
 elif [ $SIPHOST == $SORENSON ]; then
         echo "SET VARIABLE endpoint Sorenson"
 elif [ $SIPHOST == $SORENSON2 ]; then
-        echo "SET VARIABLE endpoint Sorenson"
+        echo "SET VARIABLE endpoint Sorenson2"
 elif [ $SIPHOST == $SORENSONQA ]; then
         echo "SET VARIABLE endpoint SorensonQA"
 elif [ $SIPHOST == $ZVRS ]; then
