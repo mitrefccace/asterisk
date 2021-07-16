@@ -38,7 +38,7 @@ Before executing the install script, you MUST modify this file with the values f
 | <hostname>          | The domain name associated with the server.                                         |
 | <local_ip>          | The private/local IP address of the Asterisk.                                       |
 | <public_ip>         | The external.public IP address of the Asterisk server.                              |
-| <kamailio_local_ip> | The private/local IP address of the Proxy server.                                   |
+| <kamailio_local_ip> | The private/local IP address of the Proxy Server (Kamailio).                        |
 | <stun_server>       | STUN/TURN server address:port. We recommend building a dedicated STUN server, as public STUN servers can become congested and lead to higher latency for STUN/ICE. If you do not have one, a Google STUN server will be used in the config instead.|                                  
 | <crt_file>          | CA cert file for server. Generated self-signed cert is used if none is provided.    |
 | <crt_key>           | Private key for CA cert.                                                            |
@@ -122,10 +122,10 @@ the project after applying the patches.
 ## Example usage
 
 ```sh
-$ ./update_asterisk.sh --version 15.3.0 --patch --config --dialin 7032935641 --media --backup --restart --cli
+$ ./update_asterisk.sh --version 16.8.0 --patch --config --dialin 7032935641 --media --backup --restart --cli
 
 ```
-* The example above will look for the asterisk-15.3.0 repository so that it can apply the patch files then rebuild
+* The example above will look for the asterisk-16.8.0 repository so that it can apply the patch files then rebuild
 the source. Afterwards, it will handle the replacement of the configuration files and media files after creating backups of each directory, set the dialin value in the Asterisk 
 database to 7032935641, restart, and launch the Asterisk CLI.
 
@@ -143,10 +143,10 @@ from the Allow Header for outbound SIP/SDP INVITES. To do this, the script accom
 
 ## Example Usage
 
-This will rebuild the Asterisk 15.3.0 source code with our custom patched version of PjProject 2.7.1. The __--clean__ flag will remove some of the build artifacts and temporary directories created by the script.
+This will rebuild the Asterisk 16.8.0 source code with our custom patched version of PjProject 2.7.1. The __--clean__ flag will remove some of the build artifacts and temporary directories created by the script.
 
 ``` sh
-$ ./build_pjproject.sh --ast-version 15.3.0 --pj-version 2.7.1 --clean
+$ ./build_pjproject.sh --ast-version 16.8.0 --pj-version 2.7.1 --clean
 ```
 
 If you would like to use the default values, run the following command:
@@ -159,7 +159,7 @@ Then it will assume the following values:
 
 |         Flag        |          Value           |
 |--------------------:|-------------------------:|
-Asterisk Version      |  15.3.0
+Asterisk Version      |  16.8.0
 PJ-Project Version    |  2.7.1
 Rebuild Asterisk      |  true
 Remove Artifacts      |  false

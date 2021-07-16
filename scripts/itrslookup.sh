@@ -8,98 +8,138 @@
 #               2. NAPTR lookup in regular DNS
 #               3. SRV lookup in regular DNS
 # Params:
-#       $1: Number to lookup. Input should be in a form like: 7272022137
+#       $1: Number to lookup. Input should be in a form like: 1234567890
 #       $2: modes as described above ["simple"|"full"]
 #
 # Example dial-plan execution:
 #	same => n,AGI(itrslookup.sh,${EXTEN},"simple")
 #
-# Authors: Joe Gruessing and Said Masoud
 #
+# Provider URIs (one line required per provider)
+PROVIDER="PROVIDER-FQDN-HERE"
+PROVIDER2="PROVIDER2-FQDN-HERE"
 
-# provider URIs
-CONVO="sbc.sip.convorelay.net"
-PURPLE="vrs-bgw.prod.purple.us"
-GLOBAL="globalvrs.tv"
-SORENSON="p.ci.svrs.net"
-SORENSON2="p2.ci.svrs.net"
-SORENSONQA="p.ci-qa-a.svrs.net"
-ZVRS="sbc.prod.champvrs.com"
+# IP of lookup server
+ITRSIP="IP HERE"
 
-ITRSIP="156.154.59.67"
 PHONENUM=$1
 
 # if +1 was added to beginning of number, cut that off from the beginning of the string
 
 if [ `echo $PHONENUM | cut -b -2` == "+1" ]; then
         PHONENUM=`echo $PHONENUM | cut -b 3-`
+	PHONENUM=$(echo ${PHONENUM%%@})
+        # set the $EXTEN variable in Asterisk
+        echo "SET VARIABLE EXTEN $PHONENUM"
+elif [ `echo $PHONENUM | cut -b -1` == "1" ]; then
+        PHONENUM=`echo $PHONENUM | cut -b 2-`
+	PHONENUM=$(echo ${PHONENUM%%@})
         # set the $EXTEN variable in Asterisk
         echo "SET VARIABLE EXTEN $PHONENUM"
 fi
 
-echo $PHONENUM
+
+timestamp=$(date +"%r")
+cdate=$(date)
+echo "" 2>&1|tee -a itrs.log
+echo "Calling" 2>&1|tee -a itrs.log
+echo "Call Time:$cdate" 2>&1|tee -a itrs.log
+echo $PHONENUM 2>&1|tee -a itrs.log
 
 # combine phone number with .1 suffix
 REVPHONENUM="`echo $PHONENUM|rev|sed 's/\(.\)/\1./g'`"
 ONE=1
 COMBINED=$REVPHONENUM$ONE
 
-#SIPURI="`dig @$ITRSIP in naptr $COMBINED.itrs.us | grep "E2U+sip"|head| cut -f2 -d\@|cut -f1 -d\!`"
+# add processing for `call forwarding` like of behavior, will return 
+SIPURI1="`dig @$ITRSIP in naptr $COMBINED.itrs.us | grep "CNAME"| awk NR==1 | cut -f3`"
+echo "SIPURI1:$SIPURI1" 2>&1|tee -a itrs.log
+
 # Add capability of priority sorting and selection of the top result in multiple records --cchow_20180717
-SIPURI="`dig @$ITRSIP in naptr $COMBINED.itrs.us | grep "E2U+sip"|head| sort -n -k5 | awk NR==1 | cut -f2 -d\@| cut -f1 -d\!`"
-#SIPURI2="`host -t NAPTR $SIPURI| cut -f10 -d\ `"
+if [ -z $SIPURI1 ]; then
+	SIPURI2="`dig @$ITRSIP in naptr $COMBINED.itrs.us | grep "E2U+sip"|head| sort -n -k5 | awk NR==1 | cut -f2 -d\@| cut -f1 -d\!`"
+else
+	SIPURI2="`dig @$ITRSIP in naptr $SIPURI1 | grep "E2U+sip"|head| sort -n -k5 | awk NR==1 | cut -f2 -d\@| cut -f1 -d\!`"
+fi
+echo "SIPURI2:$SIPURI2" 2>&1|tee -a itrs.log
 
 if [ "$2" == "simple" ]; then
-        echo "SET VARIABLE sipuri $SIPURI"
+        echo "SET VARIABLE sipuri $SIPURI2"
         exit 0
 fi
 
-# Add priority sorting and choosing the top result in multiple NAPTR records (AWS Route53) --cchow_20180913
-SIPURI2="`host -t NAPTR $SIPURI | sort -n -k2 | grep tcp | awk NR==1 | awk '{ print $NF }'`"
-#SIPURI2="`host -t NAPTR $SIPURI|grep tcp|awk '{ print $NF }'`"
-echo "SIP URI is $SIPURI"
+# Add priority sorting and choosing the top result in multiple NAPTR records (AWS Route53)
+#SIPURI3="`host -t NAPTR $SIPURI2 | sort -n -k2 | grep tcp | awk NR==1 | awk '{ print $NF }'`"
+#echo "SIPURI3 is $SIPURI3" 2>&1|tee -a itrs.log
 
-#if no NAPTR record exists for the SIP URI, we'll try to place a SIP call using port 5060
-if [ -z $SIPURI2 ]; then
-        echo "SET VARIABLE uri $SIPURI:5060"
-        exit 0
+#: <<'BLOCK_COMMENT'
+i="0"
+while [ $i -lt 4 ]
+do
+   SIPURI3="`host -t NAPTR $SIPURI2 | sort -n -k2 | grep tcp | awk NR==1 | awk '{ print $NF }'`"
+   if [ ! -z $SIPURI3 ]; then
+      echo "SIPURI3:$SIPURI3" 2>&1|tee -a itrs.log
+      break
+   fi
+   echo "SIPURI2 used for SIPURI3:$SIPURI2"  2>&1|tee -a itrs.log
+   echo "SIPURI3:$SIPURI3 => SIPURI3 is null, trying again" 2>&1|tee -a itrs.log
+   i=$[$i+1]
+done
+if [ $i == 4 ]; then
+   echo "Null SIPURI3(tried 4 times)=> Trying SIPURI2:5060"  2>&1|tee -a itrs.log
+   #if no NAPTR record exists for the SIP URI, we'll try to place a SIP call using port 5060
+   if [ ! -z $SIPURI2 ]; then
+      echo "SET VARIABLE uri $SIPURI2:5060"
+      SIPURI3="`host -t NAPTR $uri | sort -n -k2 | grep tcp | awk NR==1 | awk '{ print $NF }'`"
+      if [ -z $SIPURI3 ]; then
+         echo "Null SIPURI3=> Exiting"  2>&1|tee -a itrs.log
+         exit 0
+      fi
+   else
+      echo "Null SIPURI3 and SIPURI2=> Exiting"  2>&1|tee -a itrs.log
+      exit 0
+   fi
+fi
+#BLOCK_COMMENT
+
+
+# Add capability of priority sorting (normal use case that picks the higher priority record) and selection of th top result in multiple record
+#SIPURI4="`host -t SRV $SIPURI3 | sort -n -k2 | awk NR==1`"
+#: <<'BLOCK_COMMENT'
+i="0"
+while [ $i -lt 4 ]
+do
+   SIPURI4="`host -t SRV $SIPURI3 | sort -n -k2 | awk NR==1`"
+   if [[ ! -z "$SIPURI4" ]]; then
+      if [[ "$SIPURI4" == *"SRV record"* ]]; then
+         break
+      fi
+   fi
+   echo "SIPURI4:$SIPURI4 => SIPURI4 is Invalid, trying again" 2>&1|tee -a itrs.log
+   i=$[$i+1]
+done
+if [ $i == 4 ]; then
+   echo "Null SIPURI4 is Invalid=> Exiting"  2>&1|tee -a itrs.log
+   exit 0
+fi
+#BLOCK_COMMENT
+echo "SIPURI4:$SIPURI4" 2>&1|tee -a itrs.log
+SIPPORT="`echo $SIPURI4| cut -f7 -d\ `"
+
+SIPHOST="`echo $SIPURI4| cut -f8 -d\ |rev|cut -c 2-|rev`"
+
+# Loop through provider URIs, and set the Asterisk variable on the one that matches
+# the current phone number being queried
+echo "SIPHOST:$SIPHOST" 2>&1|tee -a itrs.log
+if [[ $SIPHOST == $PROVIDER ]]; then
+        echo "SET VARIABLE endpoint PROVIDER"
+elif [[ $SIPHOST == $PROVIDER2 ]]; then
+        echo "SET VARIABLE endpoint PROVIDER2"
+#elif [[ $SIPHOST == $LIN ]]; then
+#        echo "SET VARIABLE endpoint LIN"
 fi
 
-#exit 0
-# Interop 2018/05 - Add sorting to include the priority consideration (this is reversed for sorenson, using lower priority one)
-#SIPURI3="`host -t SRV $SIPURI2 | sort -n -r -k2`"
-# Add capability of priority sorting (normal use case that picks the higher priority record) and selection of th top result in multiple record --cchow_20180717
-SIPURI3="`host -t SRV $SIPURI2 | sort -n -k2 | awk NR==1`"
-SIPPORT="`echo $SIPURI3| cut -f7 -d' '`"
-
-# Sorensen sometimes uses 50060 as their port. Since that's not open for us, we'll use 5060
-
-if [ "$SIPPORT" == "50060" ]; then
-        SIPPORT="5060"
-fi
-
-
-SIPHOST="`echo $SIPURI3| cut -f8 -d' '|rev|cut -c 2-|rev`"
-
-#loop through provider URIs, and set the Asterisk variable on the one that matches
-#the current phone number being queried
-
-if [ $SIPHOST == $CONVO ]; then
-        echo "SET VARIABLE endpoint Convo"
-elif [ $SIPHOST == $PURPLE ]; then
-        echo "SET VARIABLE endpoint Purple"
-elif [ $SIPHOST == $GLOBAL ]; then
-        echo "SET VARIABLE endpoint Global"
-elif [ $SIPHOST == $SORENSON ]; then
-        echo "SET VARIABLE endpoint Sorenson"
-elif [ $SIPHOST == $SORENSON2 ]; then
-        echo "SET VARIABLE endpoint Sorenson"
-elif [ $SIPHOST == $SORENSONQA ]; then
-        echo "SET VARIABLE endpoint SorensonQA"
-elif [ $SIPHOST == $ZVRS ]; then
-        echo "SET VARIABLE endpoint ZVRS"
-fi
-
-
-echo "port is $SIPPORT"
+#echo $SIPHOST
+echo "HOST is $SIPHOST"
+echo "Port is $SIPPORT"
 echo "SET VARIABLE uri $SIPHOST:$SIPPORT"

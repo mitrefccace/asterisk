@@ -1,11 +1,10 @@
 #!/bin/bash
 
 #----------------------------------------------------------------------------
-# Author   : Connor McCann
-# Project  : Ace Direct Asterisk Configuration 
+# Project  : ACE Direct Asterisk Configuration 
 # Date     : 31 Jan 2018
 # Purpose  : To automate patches and the installation of Asterisk configuration 
-#            files on various Ace Direct servers.
+#            files on various ACE Direct servers.
 #----------------------------------------------------------------------------
 
 function show_instructions {
@@ -23,7 +22,7 @@ function show_instructions {
 		echo "+            --patch    : Optional : Applies patch files to source code                           +"
 		echo "+            --config   : Optional : Copies configuration files into /etc/asterisk/               +"
 		echo "+            --media    : Optional : Copies media files into /var/lib/asterisk/sounds             +"
-		echo "+            --backup   : Optional : Copies direcotry files to backup directory before installing +"
+		echo "+            --backup   : Optional : Copies directory files to backup directory before installing +"
 		echo "+            --no-db    : Optional : Prevents the script from checking DB values                  +"
 		echo "+            --version  : Optional : Specifies which version of Asterisk to look for              +"
 		echo "+            --no-build : Optional : Opts not to build the source code                            +"
@@ -446,8 +445,8 @@ function install_configs {
 	
 	# move odbc.ini.sample to /etc. 
 	# TODO: Doing this manually for now, maybe we can make this dynamic?
-	cp odbc.ini.sample /etc/odbc.ini
-	print_message "Notify" "copied odbc.ini.sample ---> /etc/odbc.ini"
+	# cp odbc.ini.sample /etc/odbc.ini
+	# print_message "Notify" "copied odbc.ini.sample ---> /etc/odbc.ini"
 
 	# make a backup of the configuration files if desired
 	if [ $backup == "true" ]; then
@@ -465,8 +464,8 @@ function install_configs {
 		print_message "Error" "$INPUT file not found"
 		exit 1
 	else
-		# copy the configuration files into /etc/asterisk
-		configFiles=$(find ../config -name '*.*')
+		# copy the Asterisk configuration files into /etc/asterisk
+		configFiles=$(find ../config/etc/asterisk -name '*.*')
 		echo "============================================================"
 		for file in $configFiles
 		do
@@ -476,6 +475,20 @@ function install_configs {
 				print_message "Notify" "copied ${file} ---> /etc/asterisk/"
 			else
 				print_message "Error" "failed to copy ${file} ---> /etc/asterisk/"
+				configStatus=false
+			fi
+		done
+		# copy the ODBC configuration files into /etc
+		configFiles=$(find ../config/etc -name '*.*')
+		echo "============================================================"
+		for file in $configFiles
+		do
+			cp $file /etc/
+
+			if [[ $? == "0" ]]; then
+				print_message "Notify" "copied ${file} ---> /etc/"
+			else
+				print_message "Error" "failed to copy ${file} ---> /etc/"
 				configStatus=false
 			fi
 		done

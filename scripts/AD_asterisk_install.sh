@@ -9,7 +9,7 @@ startPath=$(pwd)
 PUBLIC_IP=''
 
 #Asterisk version
-AST_VERSION="15.3.0"
+AST_VERSION="16.8.0"
 
 # Config file
 INPUT=.config

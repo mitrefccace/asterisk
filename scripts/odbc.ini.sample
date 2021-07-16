@@ -1,8 +1,0 @@
-[asterisk-connector]
-Description = MySQL connection to 'asterisk' database
-Driver = MySQL
-Database = <cdr_db>
-Server = <cdr_host>
-User = <cdr_user>
-Password = <cdr_pass>
-Port = 3306
